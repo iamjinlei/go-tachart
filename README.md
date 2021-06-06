@@ -33,6 +33,7 @@ More TA chart and event types will be added to support a wide-range to use cases
 ### Usage
 
 In this example, a simple chart is created with a few lines of code. A complete code example can be found in the example folder.
+![demo](https://user-images.githubusercontent.com/6463139/120927551-cf3b2d00-c713-11eb-88ab-8731b8ad7381.png)
 
 ```golang
 package main
