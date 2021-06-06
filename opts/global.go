@@ -581,7 +581,7 @@ type XAxis struct {
 	Type string `json:"type,omitempty"`
 
 	// Set this to false to prevent the axis from showing.
-	Show bool `json:"show,omitempty"`
+	Show bool `json:"show"`
 
 	// Category data, available in type: 'category' axis.
 	Data interface{} `json:"data,omitempty"`
@@ -643,7 +643,7 @@ type YAxis struct {
 	Type string `json:"type,omitempty"`
 
 	// Set this to false to prevent the axis from showing.
-	Show bool `json:"show,omitempty"`
+	Show bool `json:"show"`
 
 	// Category data, available in type: 'category' axis.
 	Data interface{} `json:"data,omitempty"`

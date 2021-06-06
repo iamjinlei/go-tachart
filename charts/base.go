@@ -63,6 +63,7 @@ type BaseConfiguration struct {
 	hasPolar      bool
 }
 
+// Note(lei): formatter function is not working with html escaping turned on
 func (bc *BaseConfiguration) NoEscapeJSON() string {
 	buf := new(bytes.Buffer)
 	enc := json.NewEncoder(buf)

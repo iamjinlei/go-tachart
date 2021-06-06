@@ -48,7 +48,7 @@ var (
 )
 
 type Event struct {
-	Type     EventType
-	Label    string  // x-axis label. Should match to one of the candles
-	Position float64 // price position. If 0, auto determined
+	Type        EventType
+	Label       string // x-axis label. Should match to one of the candles
+	Description string // any user-defined description wants to appear on tooltip
 }

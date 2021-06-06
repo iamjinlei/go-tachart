@@ -97,9 +97,21 @@ var (
 	}
 
 	events = []tachart.Event{
-		{Type: tachart.Long, Label: cdls[30].Label},
-		{Type: tachart.Short, Label: cdls[40].Label},
-		{Type: tachart.Long, Label: cdls[61].Label},
+		{
+			Type:        tachart.Long,
+			Label:       cdls[30].Label,
+			Description: "go long on " + cdls[30].Label,
+		},
+		{
+			Type:        tachart.Short,
+			Label:       cdls[40].Label,
+			Description: "This is a demo event description. Randomly pick this candle to go short on " + cdls[40].Label,
+		},
+		{
+			Type:        tachart.Long,
+			Label:       cdls[61].Label,
+			Description: "go short on " + cdls[61].Label,
+		},
 	}
 )
 
@@ -115,5 +127,5 @@ func main() {
 		},
 	})
 
-	c.GenStatic(cdls, events, "/Volumes/tmpfs/tmp/kline.html")
+	c.GenStatic("Candlestick Chart Demo", cdls, events, "/Volumes/tmpfs/tmp/kline.html")
 }

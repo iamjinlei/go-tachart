@@ -3,9 +3,9 @@ package tachart
 type OverlayType string
 
 const (
-	SMA   OverlayType = "sma"
-	EMA   OverlayType = "ema"
-	FIXED OverlayType = "fixed"
+	SMA   OverlayType = "SMA"
+	EMA   OverlayType = "EMA"
+	FIXED OverlayType = "FIXED"
 )
 
 type OverlayChart struct {
