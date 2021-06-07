@@ -48,6 +48,9 @@ type BarChart struct {
 	ShowBackground bool
 	RoundCap       bool
 	CoordSystem    string
+
+	// zlevel value of all graphical elements in bar.
+	ZLevel int
 }
 
 // SunburstChart

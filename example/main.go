@@ -99,33 +99,40 @@ var (
 	events = []tachart.Event{
 		{
 			Type:        tachart.Long,
-			Label:       cdls[30].Label,
+			Label:       cdls[55].Label,
 			Description: "go long on " + cdls[30].Label,
 		},
 		{
 			Type:        tachart.Short,
-			Label:       cdls[40].Label,
+			Label:       cdls[60].Label,
 			Description: "This is a demo event description. Randomly pick this candle to go short on " + cdls[40].Label,
 		},
 		{
 			Type:        tachart.Long,
-			Label:       cdls[61].Label,
+			Label:       cdls[71].Label,
 			Description: "go short on " + cdls[61].Label,
 		},
 	}
 )
 
 func main() {
-	c := tachart.New([]tachart.OverlayChart{
-		tachart.OverlayChart{
-			Type: tachart.SMA,
-			N:    5,
-		},
-		tachart.OverlayChart{
-			Type: tachart.SMA,
-			N:    20,
-		},
-	})
+	cfg := tachart.NewConfig().
+		AddOverlay(
+			tachart.IndicatorConfig{
+				Type:  tachart.SMA,
+				Param: "5",
+			},
+			tachart.IndicatorConfig{
+				Type:  tachart.SMA,
+				Param: "20",
+			}).
+		AddIndicator(
+			tachart.IndicatorConfig{
+				Type:  tachart.MACD,
+				Param: "12,26,9",
+			})
 
-	c.GenStatic("Candlestick Chart Demo", cdls, events, "/Volumes/tmpfs/tmp/kline.html")
+	c, _ := tachart.New(*cfg)
+
+	c.GenStatic(cdls, events, "/Volumes/tmpfs/tmp/kline.html")
 }

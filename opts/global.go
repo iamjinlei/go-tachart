@@ -19,7 +19,7 @@ func init() {
 // Initialization contains options for the canvas.
 type Initialization struct {
 	// HTML title
-	PageTitle string `default:"Awesome go-tachart"`
+	PageTitle string `default:""`
 
 	// Width of canvas
 	Width string `default:"900px"`

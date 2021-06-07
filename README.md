@@ -28,11 +28,16 @@ This is a fork and extension to the beautiful [go-echarts](https://github.com/go
 Some of the [go-echarts](https://github.com/go-echarts/go-echarts) code is modified to tailor to the needs of TA charts.
 To keep iteration simple, [go-echarts](https://github.com/go-echarts/go-echarts) code is replicated in this repo.
 This is still a work-in-progress.
-More TA chart and event types will be added to support a wide-range to use cases.
+More TA chart and event types will be added to support a wide-range of use cases.
 
 ### How It Looks Like
 
-![demo](https://user-images.githubusercontent.com/6463139/120927551-cf3b2d00-c713-11eb-88ab-8731b8ad7381.png)
+#### Candlestick chart with moving average overlay on top
+![Screen Shot 2021-06-07 at 10 19 42 PM](https://user-images.githubusercontent.com/6463139/121033488-d2e7b600-c7de-11eb-8d35-77f3582e69ca.png)
+
+#### Candlestick chart with moving average overlay on top + additional indicators
+![Screen Shot 2021-06-07 at 10 20 18 PM](https://user-images.githubusercontent.com/6463139/121033791-0fb3ad00-c7df-11eb-9fd3-02649089ce13.png)
+
 
 ### Usage
 
@@ -53,6 +58,7 @@ func main() {
 		{Label: "2018/1/29", O: 2347.22, C: 2358.98, L: 2337.35, H: 2363.8, V: 249910},
 		{Label: "2018/1/30", O: 2360.75, C: 2382.48, L: 2347.89, H: 2383.76, V: 119910},
 		{Label: "2018/1/31", O: 2383.43, C: 2385.42, L: 2371.23, H: 2391.82, V: 89940},
+        ... // To fill more data
 		{Label: "2018/6/13", O: 2190.1, C: 2148.35, L: 2126.22, H: 2190.1, V: 239510},
 	}
 
@@ -64,17 +70,24 @@ func main() {
 		},
 	}
 
-	c := tachart.New([]tachart.OverlayChart{
-		tachart.OverlayChart{
-			Type: tachart.SMA,
-			N:    5,
-		},
-		tachart.OverlayChart{
-			Type: tachart.SMA,
-			N:    20,
-		},
-	})
+	cfg := tachart.NewConfig().
+		AddOverlay(
+			tachart.IndicatorConfig{
+				Type:  tachart.SMA,
+				Param: "5",
+			},
+			tachart.IndicatorConfig{
+				Type:  tachart.SMA,
+				Param: "20",
+			}).
+		AddIndicator(
+			tachart.IndicatorConfig{
+				Type:  tachart.MACD,
+				Param: "12,26,9",
+			})
 
-	c.GenStatic("Candlestick Chart Demo", cdls, events, "/tmp/demo.html")
+	c, _ := tachart.New(*cfg)
+
+	c.GenStatic(cdls, events, "/tmp/demo.html")
 }
 ```

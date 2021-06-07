@@ -1,14 +1,10 @@
 package tachart
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/markcheno/go-talib"
 
 	"github.com/iamjinlei/go-tachart/charts"
 	"github.com/iamjinlei/go-tachart/components"
@@ -29,14 +25,13 @@ const (
 	tooltipFormatterFuncTpl = `
 		function(value) {
 			var eventMap = JSON.parse('__EVENT_MAP__');
-
 			var title = (sz,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;font-weight:bold;">'+txt+'</span>';
 			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;">'+sign+'</span>'+txt+'</span>';
 			var wrap = (sz,txt,width) => '<span style="display:inline-block;width:'+width+'px;word-break:break-word;word-wrap:break-word;white-space:pre-wrap;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 
 			value.sort((a, b) => a.seriesIndex -b.seriesIndex);
 			var cdl = value[0];
-			var ret = title(14,cdl.axisValueLabel) + '<br/>' +
+			var ret = title(14, cdl.axisValueLabel)+ '  ['+cdl.dataIndex+']' + '<br/>' +
 			square(13,'O',cdl.color,cdl.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'C',cdl.color,cdl.value[2].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'L',cdl.color,cdl.value[3].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
@@ -48,22 +43,22 @@ const (
 
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
-				ret += '<br/>' + title(14,'Event Desc.') + '<br/>' + wrap(13,desc,160);
+				ret += '<hr>' + wrap(13,desc,160);
 			}
 			return ret;
 		}`
-	candleYMinFuncTpl = `
+	minRoundFuncTpl = `
 		function(value) {
-			var m = Math.pow(10, __DECIMAL_PLACES__);
-			return Math.round(value.min*0.98 * m) / m;
+			return (value.min*0.99).toFixed(__DECIMAL_PLACES__);
+		}`
+	maxRoundFuncTpl = `
+		function(value) {
+			return (value.max*1.01).toFixed(__DECIMAL_PLACES__);
 		}`
 	yLabelFormatterFuncTpl = `
 		function(value) {
 			return value.toFixed(__DECIMAL_PLACES__);
 		}`
-
-	colorDownBar = "#00da3c"
-	colorUpBar   = "#ec0000"
 )
 
 var (
@@ -72,23 +67,217 @@ var (
 
 type TAChart struct {
 	// TODO: support dynamic auto-refresh
-	overlays []OverlayChart
+	cfg            Config
+	globalOptsData globalOptsData
+	extendedXAxis  []opts.XAxis
+	extendedYAxis  []opts.YAxis
 }
 
-func New(overlays []OverlayChart) *TAChart {
-	return &TAChart{
-		overlays: overlays,
+func New(cfg Config) (*TAChart, error) {
+	// sanity check config
+	for i, ol := range cfg.overlays {
+		parsed, err := ol.parse()
+		if err != nil {
+			return nil, err
+		}
+		cfg.overlays[i] = parsed
 	}
+	for i, ind := range cfg.indicators {
+		parsed, err := ind.parse()
+		if err != nil {
+			return nil, err
+		}
+		cfg.indicators[i] = parsed
+	}
+
+	decimalPlaces := fmt.Sprintf("%v", cfg.precision)
+	minRoundFunc := strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
+	maxRoundFunc := strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
+	yLabelFormatterFunc := strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
+	tooltipFormatterFunc := strings.Replace(tooltipFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
+
+	// grid layuout: N = len(indicators) + 1
+	// ----------------------------------------
+	//   candlestick chart + overlay + events (h/2)
+	// ----------------------------------------
+	//   		indicator chart               (h/2/N)
+	//   			...
+	//   		indicator chart               (h/2/N)
+	// ----------------------------------------
+	//   		  volume chart                (h/2/N)
+	// ----------------------------------------
+
+	left := 80
+	right := 40
+	sliderH := 70
+	gap := 40
+
+	h := (cfg.h - sliderH) / (len(cfg.indicators) + 1 + 2)
+	// candlestick+overlay
+	cdlChartTop := 20
+	// event
+	eventChartTop := cdlChartTop + h*2 - 30
+	eventChartH := 10
+
+	grids := []opts.Grid{
+		opts.Grid{ // candlestick + overlay
+			Left:   px(left),
+			Right:  px(right),
+			Top:    px(cdlChartTop),
+			Height: px(h * 2),
+		},
+		opts.Grid{ // event
+			Left:   px(left),
+			Right:  px(right),
+			Top:    px(eventChartTop),
+			Height: px(eventChartH),
+		},
+	}
+	xAxisIndex := []int{0, 1}
+	extendedXAxis := []opts.XAxis{
+		opts.XAxis{ // event
+			Show:      false,
+			GridIndex: 1,
+		},
+	}
+	extendedYAxis := []opts.YAxis{
+		opts.YAxis{ // event
+			Show:      false,
+			GridIndex: 1,
+		},
+	}
+
+	// indicator & vol chart, inddex starting from 2
+	top := cdlChartTop + h*2 + gap
+	for i := 0; i < len(cfg.indicators)+1; i++ {
+		gridIndex := i + 2
+		grids = append(grids, opts.Grid{
+			Left:   px(left),
+			Right:  px(right),
+			Top:    px(top),
+			Height: px(h - gap),
+		})
+		top += h
+
+		xAxisIndex = append(xAxisIndex, gridIndex)
+
+		extendedXAxis = append(extendedXAxis, opts.XAxis{
+			Show:        true,
+			GridIndex:   gridIndex,
+			SplitNumber: 20,
+			AxisTick: &opts.AxisTick{
+				Show: false,
+			},
+			AxisLabel: &opts.AxisLabel{
+				Show: false,
+			},
+		})
+		// TODO: make this configurable
+		min := minRoundFunc
+		max := maxRoundFunc
+		indYLabelFormatterFunc := yLabelFormatterFunc
+		if i == len(cfg.indicators) {
+			// volume
+			min = "0"
+			indYLabelFormatterFunc = strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+		} else {
+			v := cfg.indicators[i].yAxisLabel()
+			if v != "" {
+				indYLabelFormatterFunc = v
+			}
+			v = cfg.indicators[i].yAxisMin()
+			if v != "" {
+				min = v
+			}
+			v = cfg.indicators[i].yAxisMax()
+			if v != "" {
+				max = v
+			}
+		}
+
+		extendedYAxis = append(extendedYAxis, opts.YAxis{
+			Show:        true,
+			GridIndex:   gridIndex,
+			Scale:       true,
+			SplitNumber: 2,
+			SplitLine: &opts.SplitLine{
+				Show: false,
+			},
+			AxisLabel: &opts.AxisLabel{
+				Show:         true,
+				ShowMinLabel: true,
+				ShowMaxLabel: true,
+				Formatter:    opts.FuncOpts(indYLabelFormatterFunc),
+			},
+			Min: opts.FuncOpts(min),
+			Max: opts.FuncOpts(max),
+		})
+	}
+
+	globalOptsData := globalOptsData{
+		init: opts.Initialization{
+			Width:  px(cfg.w),
+			Height: px(cfg.h),
+		},
+		tooltip: opts.Tooltip{
+			Show:      true,
+			Trigger:   "axis",
+			TriggerOn: "mousemove|click",
+			Position:  opts.FuncOpts(tooltipPositionFunc),
+			Formatter: opts.FuncOpts(tooltipFormatterFunc),
+		},
+		axisPointer: opts.AxisPointer{
+			Type: "line",
+			Snap: true,
+			Link: opts.AxisPointerLink{
+				XAxisIndex: "all",
+			},
+		},
+		grids: grids,
+		xAxis: opts.XAxis{ // candlestick+overlay
+			Show:        true,
+			GridIndex:   0,
+			SplitNumber: 20,
+		},
+		yAxis: opts.YAxis{ // candlestick+overlay
+			Show:      true,
+			GridIndex: 0,
+			Scale:     true,
+			SplitArea: &opts.SplitArea{
+				Show: true,
+			},
+			Min: opts.FuncOpts(minRoundFunc),
+			Max: opts.FuncOpts(maxRoundFunc),
+			AxisLabel: &opts.AxisLabel{
+				Show:         true,
+				ShowMinLabel: true,
+				ShowMaxLabel: true,
+				Formatter:    opts.FuncOpts(yLabelFormatterFunc),
+			},
+		},
+		dataZoom: opts.DataZoom{
+			Start:      50,
+			End:        100,
+			XAxisIndex: xAxisIndex,
+		},
+	}
+
+	return &TAChart{
+		cfg:            cfg,
+		globalOptsData: globalOptsData,
+		extendedXAxis:  extendedXAxis,
+		extendedYAxis:  extendedYAxis,
+	}, nil
 }
 
-func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path string) error {
-	x := make([]string, 0)
+func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
+	xAxis := make([]string, 0)
 	klineSeries := []opts.KlineData{}
 	volSeries := []opts.BarData{}
 	closes := []float64{}
 	cdlMap := map[string]*Candle{}
 	for _, cdl := range cdls {
-		x = append(x, cdl.Label)
+		xAxis = append(xAxis, cdl.Label)
 		// open,close,low,high
 		klineSeries = append(klineSeries, opts.KlineData{Value: []float64{cdl.O, cdl.C, cdl.L, cdl.H}})
 		closes = append(closes, cdl.C)
@@ -113,7 +302,8 @@ func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path str
 		cdlMap[cdl.Label] = &c
 	}
 
-	chart := charts.NewKLine().SetXAxis(x).AddSeries("kline",
+	// candlestick+overlay
+	chart := charts.NewKLine().SetXAxis(xAxis).AddSeries("kline",
 		klineSeries,
 		charts.WithKlineChartOpts(opts.KlineChart{
 			BarWidth:   "60%",
@@ -127,190 +317,24 @@ func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path str
 			BorderColor0: colorDownBar,
 		}))
 
-	for _, ol := range c.overlays {
-		var vals []float64
-		name := ""
-		switch ol.Type {
-		case SMA:
-			vals = talib.Sma(closes, ol.N)
-			for i := 0; i < ol.N; i++ {
-				vals[i] = vals[ol.N]
-			}
-			name = fmt.Sprintf("%v%v", ol.Type, ol.N)
-		case EMA:
-			vals = talib.Ema(closes, ol.N)
-			for i := 0; i < ol.N; i++ {
-				vals[i] = vals[ol.N]
-			}
-			name = fmt.Sprintf("%v%v", ol.Type, ol.N)
-		default:
-			continue
-		}
-
-		items := []opts.LineData{}
-		for _, v := range vals {
-			items = append(items, opts.LineData{Value: v})
-		}
-
-		line := charts.NewLine().
-			SetXAxis(x).
-			AddSeries(name, items, charts.WithLineChartOpts(opts.LineChart{
-				Symbol:     "none",
-				XAxisIndex: 0,
-				YAxisIndex: 0,
-				ZLevel:     100,
-			}))
-		chart.Overlap(line)
-	}
-
-	decimalPlaces := fmt.Sprintf("%v", maxDecimalPlaces(cdls))
-	candleYMinFunc := strings.Replace(candleYMinFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
-	yLabelFormatterFunc := strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
-	tooltipFormatterFunc := strings.Replace(tooltipFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
 	eventDescMap := map[string]string{}
 	for _, e := range events {
 		eventDescMap[e.Label] = e.Description
 	}
-	fmt.Printf("%v\n", toJson(eventDescMap))
-	tooltipFormatterFunc = strings.Replace(tooltipFormatterFunc, "__EVENT_MAP__", toJson(eventDescMap), 1)
-	fmt.Printf("%v\n", tooltipFormatterFunc)
 
-	chart.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{
-			Title: title,
-		}),
-		charts.WithAxisPointerOpts(opts.AxisPointer{
-			Type: "line",
-			Snap: true,
-			Link: opts.AxisPointerLink{
-				XAxisIndex: "all",
-			},
-		}),
-		charts.WithGridOpts(
-			opts.Grid{
-				Left:   "10%",
-				Right:  "8%",
-				Height: "55%",
-			},
-			opts.Grid{
-				Left:   "10%",
-				Right:  "8%",
-				Top:    "60%",
-				Height: "3%",
-			},
-			opts.Grid{
-				Left:   "10%",
-				Right:  "8%",
-				Top:    "75%",
-				Height: "13%",
-			},
-		),
-		charts.WithXAxisOpts(opts.XAxis{
-			Show:        true,
-			GridIndex:   0,
-			SplitNumber: 20,
-		}, 0),
-		charts.WithYAxisOpts(opts.YAxis{
-			Show:      true,
-			GridIndex: 0,
-			Scale:     true,
-			SplitArea: &opts.SplitArea{
-				Show: true,
-			},
-			Min: opts.FuncOpts(candleYMinFunc),
-			Max: "dataMax",
-			AxisLabel: &opts.AxisLabel{
-				Show:         true,
-				ShowMinLabel: true,
-				ShowMaxLabel: true,
-				Formatter:    opts.FuncOpts(yLabelFormatterFunc),
-			},
-		}, 0),
-		charts.WithDataZoomOpts(opts.DataZoom{
-			Start:      50,
-			End:        100,
-			XAxisIndex: []int{0, 1, 2},
-		}),
-		charts.WithTooltipOpts(opts.Tooltip{
-			Show:      true,
-			Trigger:   "axis",
-			TriggerOn: "mousemove|click",
-			Position:  opts.FuncOpts(tooltipPositionFunc),
-			Formatter: opts.FuncOpts(tooltipFormatterFunc),
-		}),
-	)
-	chart.ExtendXAxis(
-		opts.XAxis{
-			Show:      false,
-			GridIndex: 1,
-			//SplitNumber: 20,
-			Data: x,
-			/*
-				AxisTick: &opts.AxisTick{
-					Show: false,
-				},
-				AxisLabel: &opts.AxisLabel{
-					Show: false,
-				},
-			*/
-		},
-		opts.XAxis{
-			Show:        true,
-			GridIndex:   2,
-			SplitNumber: 20,
-			Data:        x,
-			AxisTick: &opts.AxisTick{
-				Show: false,
-			},
-			AxisLabel: &opts.AxisLabel{
-				Show: false,
-			},
-		})
-	chart.ExtendYAxis(
-		opts.YAxis{
-			Show:      false,
-			GridIndex: 1,
-			/*
-				SplitLine: &opts.SplitLine{
-					Show: false,
-				},
-				AxisLabel: &opts.AxisLabel{
-					Show: false,
-				},
-			*/
-		},
-		opts.YAxis{
-			Show:        true,
-			GridIndex:   2,
-			Scale:       true,
-			SplitNumber: 2,
-			SplitLine: &opts.SplitLine{
-				Show: false,
-			},
-			AxisLabel: &opts.AxisLabel{
-				Show:         true,
-				ShowMaxLabel: true,
-			},
-			Min: 0,
-			Max: "dataMax",
-		})
+	chart.SetGlobalOptions(c.globalOptsData.genOpts(eventDescMap)...)
 
-	/*
-		chartOpts := []charts.SeriesOpts{
-			charts.WithKlineChartOpts(opts.KlineChart{
-				BarWidth:   "60%",
-				XAxisIndex: 0,
-				YAxisIndex: 0,
-			}),
-			charts.WithItemStyleOpts(opts.ItemStyle{
-				Color:        colorUpBar,
-				Color0:       colorDownBar,
-				BorderColor:  colorUpBar,
-				BorderColor0: colorDownBar,
-			}),
-		}
-	*/
-	chartOpts := []charts.SeriesOpts{
+	for _, ol := range c.cfg.overlays {
+		chart.Overlap(getChart(closes, xAxis, ol, 0))
+	}
+
+	for i := 0; i < len(c.extendedXAxis); i++ {
+		c.extendedXAxis[i].Data = xAxis
+	}
+	chart.ExtendXAxis(c.extendedXAxis...)
+	chart.ExtendYAxis(c.extendedYAxis...)
+
+	evtOpts := []charts.SeriesOpts{
 		charts.WithBarChartOpts(opts.BarChart{
 			BarWidth:   "60%",
 			XAxisIndex: 1,
@@ -318,7 +342,7 @@ func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path str
 		}),
 	}
 	for _, e := range events {
-		chartOpts = append(chartOpts, charts.WithMarkPointNameCoordItemOpts(opts.MarkPointNameCoordItem{
+		evtOpts = append(evtOpts, charts.WithMarkPointNameCoordItemOpts(opts.MarkPointNameCoordItem{
 			Symbol:     "roundRect",
 			SymbolSize: 16,
 			Coordinate: []interface{}{e.Label, 0},
@@ -326,15 +350,20 @@ func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path str
 			ItemStyle:  eventLabelMap[e.Type].style,
 		}))
 	}
-	event := charts.NewBar().AddSeries("events", []opts.BarData{}, chartOpts...)
+	event := charts.NewBar().AddSeries("events", []opts.BarData{}, evtOpts...)
 	chart.Overlap(event)
 
+	// grid index starting from 2 (candlestick+event)
+	for i, ol := range c.cfg.indicators {
+		chart.Overlap(getChart(closes, xAxis, ol, i+2))
+	}
+
 	bar := charts.NewBar().
-		SetXAxis(x).
+		SetXAxis(xAxis).
 		AddSeries("Vol", volSeries, charts.WithBarChartOpts(opts.BarChart{
 			BarWidth:   "60%",
-			XAxisIndex: 2,
-			YAxisIndex: 2,
+			XAxisIndex: len(c.cfg.indicators) + 2,
+			YAxisIndex: len(c.cfg.indicators) + 2,
 		}))
 	chart.Overlap(bar)
 
@@ -348,10 +377,6 @@ func (c TAChart) GenStatic(title string, cdls []Candle, events []Event, path str
 	return page.Render(fp)
 }
 
-func toJson(o interface{}) string {
-	buf := new(bytes.Buffer)
-	enc := json.NewEncoder(buf)
-	enc.SetEscapeHTML(false)
-	enc.Encode(o)
-	return string(buf.Bytes())
+func px(v int) string {
+	return fmt.Sprintf("%vpx", v)
 }

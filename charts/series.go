@@ -166,6 +166,7 @@ func WithBarChartOpts(opt opts.BarChart) SeriesOpts {
 		s.ShowBackground = opt.ShowBackground
 		s.RoundCap = opt.RoundCap
 		s.CoordSystem = opt.CoordSystem
+		s.ZLevel = opt.ZLevel
 	}
 }
 
