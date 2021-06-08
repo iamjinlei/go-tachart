@@ -11,6 +11,7 @@ import (
 
 type globalOptsData struct {
 	init        opts.Initialization
+	titles      []opts.Title
 	tooltip     opts.Tooltip
 	axisPointer opts.AxisPointer
 	grids       []opts.Grid
@@ -24,6 +25,7 @@ func (c globalOptsData) genOpts(eventDescMap map[string]string) []charts.GlobalO
 	tooltip.Formatter = strings.Replace(tooltip.Formatter, "__EVENT_MAP__", toJson(eventDescMap), 1)
 
 	return []charts.GlobalOpts{
+		charts.WithTitleOpts(c.titles...),
 		charts.WithInitializationOpts(c.init),
 		charts.WithTooltipOpts(tooltip),
 		charts.WithAxisPointerOpts(c.axisPointer),

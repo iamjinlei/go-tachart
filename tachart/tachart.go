@@ -65,31 +65,23 @@ var (
 	ErrDuplicateCandleLabel = errors.New("candles with duplicated labels")
 )
 
+type gridLayout struct {
+	top  int
+	left int
+	w    int
+	h    int
+}
+
 type TAChart struct {
 	// TODO: support dynamic auto-refresh
 	cfg            Config
 	globalOptsData globalOptsData
 	extendedXAxis  []opts.XAxis
 	extendedYAxis  []opts.YAxis
+	gridLayouts    []gridLayout
 }
 
 func New(cfg Config) (*TAChart, error) {
-	// sanity check config
-	for i, ol := range cfg.overlays {
-		parsed, err := ol.parse()
-		if err != nil {
-			return nil, err
-		}
-		cfg.overlays[i] = parsed
-	}
-	for i, ind := range cfg.indicators {
-		parsed, err := ind.parse()
-		if err != nil {
-			return nil, err
-		}
-		cfg.indicators[i] = parsed
-	}
-
 	decimalPlaces := fmt.Sprintf("%v", cfg.precision)
 	minRoundFunc := strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
 	maxRoundFunc := strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
@@ -133,6 +125,20 @@ func New(cfg Config) (*TAChart, error) {
 			Height: px(eventChartH),
 		},
 	}
+	gridLayouts := []gridLayout{
+		gridLayout{
+			top:  cdlChartTop,
+			left: left,
+			w:    right - left,
+			h:    h * 2,
+		},
+		gridLayout{
+			top:  eventChartTop,
+			left: left,
+			w:    right - left,
+			h:    eventChartH,
+		},
+	}
 	xAxisIndex := []int{0, 1}
 	extendedXAxis := []opts.XAxis{
 		opts.XAxis{ // event
@@ -157,6 +163,13 @@ func New(cfg Config) (*TAChart, error) {
 			Top:    px(top),
 			Height: px(h - gap),
 		})
+		gridLayouts = append(gridLayouts, gridLayout{
+			top:  top,
+			left: left,
+			w:    right - left,
+			h:    h - gap,
+		})
+
 		top += h
 
 		xAxisIndex = append(xAxisIndex, gridIndex)
@@ -263,11 +276,32 @@ func New(cfg Config) (*TAChart, error) {
 		},
 	}
 
+	layout := gridLayouts[0]
+	top = layout.top - 5
+	for i, ol := range cfg.overlays {
+		globalOptsData.titles = append(globalOptsData.titles, ol.getTitleOpts(top, layout.left+5, lineColors[i])...)
+		top += chartLabelFontHeight
+	}
+	for i, ind := range cfg.indicators {
+		layout := gridLayouts[i+2]
+		globalOptsData.titles = append(globalOptsData.titles, ind.getTitleOpts(layout.top-5, layout.left+5, lineColors[i])...)
+	}
+	layout = gridLayouts[len(gridLayouts)-1]
+	globalOptsData.titles = append(globalOptsData.titles, opts.Title{
+		TitleStyle: &opts.TextStyle{
+			FontSize: chartLabelFontSize,
+		},
+		Title: "Vol",
+		Left:  px(layout.left + 5),
+		Top:   px(layout.top - 5),
+	})
+
 	return &TAChart{
 		cfg:            cfg,
 		globalOptsData: globalOptsData,
 		extendedXAxis:  extendedXAxis,
 		extendedYAxis:  extendedYAxis,
+		gridLayouts:    gridLayouts,
 	}, nil
 }
 
@@ -326,8 +360,8 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 
 	chart.SetGlobalOptions(c.globalOptsData.genOpts(eventDescMap)...)
 
-	for _, ol := range c.cfg.overlays {
-		chart.Overlap(getChart(closes, xAxis, ol, 0))
+	for i, ol := range c.cfg.overlays {
+		chart.Overlap(ol.genChart(closes, xAxis, 0, lineColors[i]))
 	}
 
 	for i := 0; i < len(c.extendedXAxis); i++ {
@@ -356,8 +390,8 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 	chart.Overlap(event)
 
 	// grid index starting from 2 (candlestick+event)
-	for i, ol := range c.cfg.indicators {
-		chart.Overlap(getChart(closes, xAxis, ol, i+2))
+	for i, ind := range c.cfg.indicators {
+		chart.Overlap(ind.genChart(closes, xAxis, i+2, ""))
 	}
 
 	bar := charts.NewBar().

@@ -33,10 +33,11 @@ More TA chart and event types will be added to support a wide-range of use cases
 ### How It Looks Like
 
 #### Candlestick chart with moving average overlay on top
-![Screen Shot 2021-06-07 at 10 19 42 PM](https://user-images.githubusercontent.com/6463139/121033488-d2e7b600-c7de-11eb-8d35-77f3582e69ca.png)
+![Screen Shot 2021-06-08 at 12 05 22 PM](https://user-images.githubusercontent.com/6463139/121121323-f566e700-c851-11eb-9b54-9eb52b0a00d8.png)
+
 
 #### Candlestick chart with moving average overlay on top + additional indicators
-![Screen Shot 2021-06-07 at 10 20 18 PM](https://user-images.githubusercontent.com/6463139/121033791-0fb3ad00-c7df-11eb-9fd3-02649089ce13.png)
+!![Screen Shot 2021-06-08 at 12 04 45 PM](https://user-images.githubusercontent.com/6463139/121121350-ff88e580-c851-11eb-8857-8691c2bb7925.png)
 
 
 ### Usage
@@ -58,7 +59,7 @@ func main() {
 		{Label: "2018/1/29", O: 2347.22, C: 2358.98, L: 2337.35, H: 2363.8, V: 249910},
 		{Label: "2018/1/30", O: 2360.75, C: 2382.48, L: 2347.89, H: 2383.76, V: 119910},
 		{Label: "2018/1/31", O: 2383.43, C: 2385.42, L: 2371.23, H: 2391.82, V: 89940},
-        ... // To fill more data
+                    ... // To fill more data
 		{Label: "2018/6/13", O: 2190.1, C: 2148.35, L: 2126.22, H: 2190.1, V: 239510},
 	}
 

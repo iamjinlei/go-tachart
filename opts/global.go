@@ -151,6 +151,8 @@ type Title struct {
 	// value relative to container width like '20%'.
 	//Adaptive by default.
 	Right string `json:"right,omitempty"`
+
+	BackgroundColor string `json:"backgroundColor,omitempty"`
 }
 
 // Legend is the option set for a legend component.

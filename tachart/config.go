@@ -9,8 +9,8 @@ type Config struct {
 	w          int
 	h          int
 	precision  int // decimal places of floating nubmers shown on chart
-	overlays   []IndicatorConfig
-	indicators []IndicatorConfig
+	overlays   []Indicator
+	indicators []Indicator
 	assetsHost string
 }
 
@@ -19,8 +19,8 @@ func NewConfig() *Config {
 		w:          900,
 		h:          500,
 		precision:  2,
-		overlays:   []IndicatorConfig{},
-		indicators: []IndicatorConfig{},
+		overlays:   []Indicator{},
+		indicators: []Indicator{},
 		assetsHost: "https://go-echarts.github.io/go-echarts-assets/assets/",
 	}
 }
@@ -40,13 +40,13 @@ func (c *Config) SetPrecision(p int) *Config {
 	return c
 }
 
-func (c *Config) AddOverlay(cfgs ...IndicatorConfig) *Config {
-	c.overlays = append(c.overlays, cfgs...)
+func (c *Config) AddOverlay(vals ...Indicator) *Config {
+	c.overlays = append(c.overlays, vals...)
 	return c
 }
 
-func (c *Config) AddIndicator(cfgs ...IndicatorConfig) *Config {
-	c.indicators = append(c.indicators, cfgs...)
+func (c *Config) AddIndicator(vals ...Indicator) *Config {
+	c.indicators = append(c.indicators, vals...)
 	return c
 }
 

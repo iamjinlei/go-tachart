@@ -18,7 +18,7 @@ type BaseConfiguration struct {
 	opts.Tooltip    `json:"tooltip"`
 	AxisPointer     *opts.AxisPointer `json:"axisPointer,omitempty"`
 	opts.Toolbox    `json:"toolbox"`
-	opts.Title      `json:"title"`
+	Title           []opts.Title `json:"title"`
 	opts.Polar      `json:"polar"`
 	opts.AngleAxis  `json:"angleAxis"`
 	opts.RadiusAxis `json:"radiusAxis"`
@@ -206,9 +206,9 @@ func WithPolarOps(opt opts.Polar) GlobalOpts {
 }
 
 // WithTitleOpts
-func WithTitleOpts(opt opts.Title) GlobalOpts {
+func WithTitleOpts(opt ...opts.Title) GlobalOpts {
 	return func(bc *BaseConfiguration) {
-		bc.Title = opt
+		bc.Title = append(bc.Title, opt...)
 	}
 }
 

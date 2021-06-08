@@ -1,9 +1,7 @@
 package tachart
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/markcheno/go-talib"
@@ -12,187 +10,216 @@ import (
 	"github.com/iamjinlei/go-tachart/opts"
 )
 
-var (
-	ErrInvalidOverlayType = errors.New("unsupported overlay chart type")
-)
-
-type IndicatorType string
-
 const (
-	SMA  IndicatorType = "SMA"
-	EMA  IndicatorType = "EMA"
-	MACD IndicatorType = "MACD"
+	chartLabelFontSize   = 11
+	chartLabelFontHeight = 13
 )
 
-type IndicatorConfig struct {
-	Type IndicatorType
-	// SMA, EMA: "n"
-	// MACD: "fast,slow,signal"
-	Param string
-	// internal
-	parsed []int
+type Indicator interface {
+	name() string
+	yAxisLabel() string
+	yAxisMin() string
+	yAxisMax() string
+	getTitleOpts(top, left int, color string) []opts.Title
+	genChart(vals []float64, xAxis interface{}, gridIndex int, color string) charts.Overlaper
 }
 
-func (c IndicatorConfig) parse() (IndicatorConfig, error) {
-	switch c.Type {
-	case SMA, EMA:
-		n, err := strconv.ParseInt(c.Param, 10, 64)
-		if err != nil {
-			return IndicatorConfig{}, fmt.Errorf("MA parameter error %v", err)
-		}
-		c.parsed = append(c.parsed, int(n))
-		return c, nil
-
-	case MACD:
-		parts := strings.Split(c.Param, ",")
-		if len(parts) != 3 {
-			return IndicatorConfig{}, fmt.Errorf("unexpected MACD parameters format: fast,slow,signal")
-		}
-		for _, part := range parts {
-			v, err := strconv.ParseInt(part, 10, 64)
-			if err != nil {
-				return IndicatorConfig{}, fmt.Errorf("MACD parameter error %v", err)
-			}
-			c.parsed = append(c.parsed, int(v))
-		}
-		return c, nil
-
-	default:
-		// unknown type
-	}
-
-	return IndicatorConfig{}, ErrInvalidOverlayType
+type ma struct {
+	nm string
+	n  int
+	fn func([]float64, int) []float64
 }
 
-func (c IndicatorConfig) yAxisLabel() string {
-	switch c.Type {
-	case SMA, EMA:
-		return ""
-
-	case MACD:
-		return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+func NewSMA(n int) Indicator {
+	return ma{
+		nm: fmt.Sprintf("SMA(%v)", n),
+		n:  n,
+		fn: talib.Sma,
 	}
+}
 
+func NewEMA(n int) Indicator {
+	return ma{
+		nm: fmt.Sprintf("EMA(%v)", n),
+		n:  n,
+		fn: talib.Ema,
+	}
+}
+
+func (c ma) name() string {
+	return c.nm
+}
+
+func (c ma) yAxisLabel() string {
 	return ""
 }
 
-func (c IndicatorConfig) yAxisMin() string {
-	switch c.Type {
-	case SMA, EMA:
-		return ""
-
-	case MACD:
-		return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
-	}
-
+func (c ma) yAxisMin() string {
 	return ""
 }
 
-func (c IndicatorConfig) yAxisMax() string {
-	switch c.Type {
-	case SMA, EMA:
-		return ""
-
-	case MACD:
-		return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
-	}
-
+func (c ma) yAxisMax() string {
 	return ""
 }
 
-func getChart(vals []float64, xAxis interface{}, c IndicatorConfig, gridIndex int) charts.Overlaper {
-	switch c.Type {
-	case SMA, EMA:
-		var ma []float64
-		if c.Type == SMA {
-			ma = talib.Sma(vals, c.parsed[0])
-		} else {
-			ma = talib.Ema(vals, c.parsed[0])
-		}
-		for i := 0; i < c.parsed[0]; i++ {
-			ma[i] = ma[c.parsed[0]]
-		}
+func (c ma) getTitleOpts(top, left int, color string) []opts.Title {
+	return []opts.Title{
+		opts.Title{
+			TitleStyle: &opts.TextStyle{
+				Color:    color,
+				FontSize: chartLabelFontSize,
+			},
+			Title: c.nm,
+			Left:  px(left),
+			Top:   px(top),
+		},
+	}
+}
 
-		items := []opts.LineData{}
-		for _, v := range ma {
-			items = append(items, opts.LineData{Value: v})
-		}
+func (c ma) genChart(vals []float64, xAxis interface{}, gridIndex int, color string) charts.Overlaper {
+	ma := c.fn(vals, c.n)
+	for i := 0; i < c.n; i++ {
+		ma[i] = ma[c.n]
+	}
 
-		return charts.NewLine().
-			SetXAxis(xAxis).
-			AddSeries(fmt.Sprintf("%v%v", c.Type, c.parsed[0]), items, charts.WithLineChartOpts(opts.LineChart{
+	items := []opts.LineData{}
+	for _, v := range ma {
+		items = append(items, opts.LineData{Value: v})
+	}
+
+	if color == "" {
+		color = lineColors[0]
+	}
+
+	return charts.NewLine().
+		SetXAxis(xAxis).
+		AddSeries(c.nm, items,
+			charts.WithLineChartOpts(opts.LineChart{
 				Symbol:     "none",
 				XAxisIndex: gridIndex,
 				YAxisIndex: gridIndex,
 				ZLevel:     100,
+			}),
+			charts.WithLineStyleOpts(opts.LineStyle{
+				Color: color,
 			}))
+}
 
-	case MACD:
-		macd, signal, hist := talib.Macd(vals, c.parsed[0], c.parsed[1], c.parsed[2])
+type macd struct {
+	nm     string
+	fast   int
+	slow   int
+	signal int
+}
 
-		lineItems := []opts.LineData{}
-		for _, v := range macd {
-			lineItems = append(lineItems, opts.LineData{Value: v})
-		}
-		macdLine := charts.NewLine().
-			SetXAxis(xAxis).
-			AddSeries(fmt.Sprintf("%v(%v)-Diff", c.Type, c.Param), lineItems,
-				charts.WithLineChartOpts(opts.LineChart{
-					Symbol:     "none",
-					XAxisIndex: gridIndex,
-					YAxisIndex: gridIndex,
-					ZLevel:     100,
-				}),
-				charts.WithItemStyleOpts(opts.ItemStyle{
-					Color: lineColors[0],
-				}),
-			)
+func NewMACD(fast, slow, signal int) Indicator {
+	return macd{
+		nm:     fmt.Sprintf("MACD(%v,%v,%v)", fast, slow, signal),
+		fast:   fast,
+		slow:   slow,
+		signal: signal,
+	}
+}
 
-		lineItems = []opts.LineData{}
-		for _, v := range signal {
-			lineItems = append(lineItems, opts.LineData{Value: v})
-		}
-		signalLine := charts.NewLine().
-			SetXAxis(xAxis).
-			AddSeries(fmt.Sprintf("%v(%v)-Sig", c.Type, c.Param), lineItems,
-				charts.WithLineChartOpts(opts.LineChart{
-					Symbol:     "none",
-					XAxisIndex: gridIndex,
-					YAxisIndex: gridIndex,
-					ZLevel:     100,
-				}),
-				charts.WithItemStyleOpts(opts.ItemStyle{
-					Color: lineColors[1],
-				}),
-			)
+func (c macd) name() string {
+	return c.nm
+}
 
-		barItems := []opts.BarData{}
-		for _, v := range hist {
-			style := &opts.ItemStyle{
-				Color: colorUpBar,
-			}
-			if v < 0 {
-				style = &opts.ItemStyle{
-					Color: colorDownBar,
-				}
-			}
-			barItems = append(barItems, opts.BarData{Value: v, ItemStyle: style})
-		}
-		histBar := charts.NewBar().
-			SetXAxis(xAxis).
-			AddSeries(fmt.Sprintf("%v(%v)", c.Type, c.Param), barItems, charts.WithBarChartOpts(opts.BarChart{
+func (c macd) yAxisLabel() string {
+	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+}
+
+func (c macd) yAxisMin() string {
+	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+}
+
+func (c macd) yAxisMax() string {
+	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+}
+
+func (c macd) getTitleOpts(top, left int, _ string) []opts.Title {
+	return []opts.Title{
+		opts.Title{
+			TitleStyle: &opts.TextStyle{
+				Color:    lineColors[0],
+				FontSize: chartLabelFontSize,
+			},
+			Title: c.nm + "-Diff",
+			Left:  px(left),
+			Top:   px(top),
+		},
+		opts.Title{
+			TitleStyle: &opts.TextStyle{
+				Color:    lineColors[1],
+				FontSize: chartLabelFontSize,
+			},
+			Title: c.nm + "-Sig",
+			Left:  px(left),
+			Top:   px(top + chartLabelFontHeight),
+		},
+	}
+}
+
+func (c macd) genChart(vals []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
+	macd, signal, hist := talib.Macd(vals, c.fast, c.slow, c.signal)
+
+	lineItems := []opts.LineData{}
+	for _, v := range macd {
+		lineItems = append(lineItems, opts.LineData{Value: v})
+	}
+	macdLine := charts.NewLine().
+		SetXAxis(xAxis).
+		AddSeries(c.nm+"-Diff", lineItems,
+			charts.WithLineChartOpts(opts.LineChart{
+				Symbol:     "none",
 				XAxisIndex: gridIndex,
 				YAxisIndex: gridIndex,
 				ZLevel:     100,
-			}))
+			}),
+			charts.WithItemStyleOpts(opts.ItemStyle{
+				Color: lineColors[0],
+			}),
+		)
 
-		macdLine.Overlap(signalLine, histBar)
-
-		return macdLine
-
-	default:
-		// will NOT happen
+	lineItems = []opts.LineData{}
+	for _, v := range signal {
+		lineItems = append(lineItems, opts.LineData{Value: v})
 	}
+	signalLine := charts.NewLine().
+		SetXAxis(xAxis).
+		AddSeries(c.nm+"-Sig", lineItems,
+			charts.WithLineChartOpts(opts.LineChart{
+				Symbol:     "none",
+				XAxisIndex: gridIndex,
+				YAxisIndex: gridIndex,
+				ZLevel:     100,
+			}),
+			charts.WithItemStyleOpts(opts.ItemStyle{
+				Color: lineColors[1],
+			}),
+		)
 
-	return nil
+	barItems := []opts.BarData{}
+	for _, v := range hist {
+		style := &opts.ItemStyle{
+			Color: colorUpBar,
+		}
+		if v < 0 {
+			style = &opts.ItemStyle{
+				Color: colorDownBar,
+			}
+		}
+		barItems = append(barItems, opts.BarData{Value: v, ItemStyle: style})
+	}
+	histBar := charts.NewBar().
+		SetXAxis(xAxis).
+		AddSeries(c.nm+"-Hist", barItems, charts.WithBarChartOpts(opts.BarChart{
+			XAxisIndex: gridIndex,
+			YAxisIndex: gridIndex,
+			ZLevel:     100,
+		}))
+
+	macdLine.Overlap(signalLine, histBar)
+
+	return macdLine
 }
