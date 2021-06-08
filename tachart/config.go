@@ -1,11 +1,17 @@
 package tachart
 
+import (
+	"path/filepath"
+	"runtime"
+)
+
 type Config struct {
 	w          int
 	h          int
 	precision  int // decimal places of floating nubmers shown on chart
 	overlays   []IndicatorConfig
 	indicators []IndicatorConfig
+	assetsHost string
 }
 
 func NewConfig() *Config {
@@ -15,6 +21,7 @@ func NewConfig() *Config {
 		precision:  2,
 		overlays:   []IndicatorConfig{},
 		indicators: []IndicatorConfig{},
+		assetsHost: "https://go-echarts.github.io/go-echarts-assets/assets/",
 	}
 }
 
@@ -40,5 +47,20 @@ func (c *Config) AddOverlay(cfgs ...IndicatorConfig) *Config {
 
 func (c *Config) AddIndicator(cfgs ...IndicatorConfig) *Config {
 	c.indicators = append(c.indicators, cfgs...)
+	return c
+}
+
+func (c *Config) UseRepoAssets() *Config {
+	// serving assets from "this" repo in local file system
+	// with accessing network
+	_, path, _, _ := runtime.Caller(0)
+	path = filepath.Dir(path)
+	c.assetsHost = filepath.Join("file:/"+filepath.Dir(path), "assets/")
+	return c
+}
+
+func (c *Config) SetAssetsHost(assetsHost string) *Config {
+	// serving assets from specified host
+	c.assetsHost = assetsHost
 	return c
 }

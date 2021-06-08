@@ -84,7 +84,8 @@ func main() {
 			tachart.IndicatorConfig{
 				Type:  tachart.MACD,
 				Param: "12,26,9",
-			})
+			}).
+        UserRepoAssets() // serving assets from current repo, avoid network access
 
 	c, _ := tachart.New(*cfg)
 

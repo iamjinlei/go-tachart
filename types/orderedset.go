@@ -1,14 +1,18 @@
 package types
 
+import (
+	"html/template"
+)
+
 // OrderedSet represents an ordered set.
 type OrderedSet struct {
-	filter map[string]bool
-	Values []string
+	filter map[template.URL]bool
+	Values []template.URL
 }
 
 // Init creates a new OrderedSet instance, and adds any given items into this set.
 func (o *OrderedSet) Init(items ...string) {
-	o.filter = make(map[string]bool)
+	o.filter = make(map[template.URL]bool)
 	for _, item := range items {
 		o.Add(item)
 	}
@@ -16,8 +20,9 @@ func (o *OrderedSet) Init(items ...string) {
 
 // Add adds a new item into the ordered set.
 func (o *OrderedSet) Add(item string) {
-	if !o.filter[item] {
-		o.filter[item] = true
-		o.Values = append(o.Values, item)
+	v := template.URL(item)
+	if !o.filter[v] {
+		o.filter[v] = true
+		o.Values = append(o.Values, v)
 	}
 }

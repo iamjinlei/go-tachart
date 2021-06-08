@@ -2,7 +2,9 @@ package opts
 
 import (
 	"fmt"
+	"html/template"
 	"math/rand"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -1106,14 +1108,14 @@ func (opt *Assets) AddCustomizedCSSAssets(assets ...string) {
 // Validate validates the static assets configurations
 func (opt *Assets) Validate(host string) {
 	for i := 0; i < len(opt.JSAssets.Values); i++ {
-		if !strings.HasPrefix(opt.JSAssets.Values[i], host) {
-			opt.JSAssets.Values[i] = host + opt.JSAssets.Values[i]
+		if !strings.HasPrefix(string(opt.JSAssets.Values[i]), host) {
+			opt.JSAssets.Values[i] = template.URL(filepath.Join(host, string(opt.JSAssets.Values[i])))
 		}
 	}
 
 	for i := 0; i < len(opt.CSSAssets.Values); i++ {
-		if !strings.HasPrefix(opt.CSSAssets.Values[i], host) {
-			opt.CSSAssets.Values[i] = host + opt.CSSAssets.Values[i]
+		if !strings.HasPrefix(string(opt.CSSAssets.Values[i]), host) {
+			opt.CSSAssets.Values[i] = template.URL(filepath.Join(host, string(opt.CSSAssets.Values[i])))
 		}
 	}
 }

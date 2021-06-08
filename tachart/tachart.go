@@ -216,8 +216,9 @@ func New(cfg Config) (*TAChart, error) {
 
 	globalOptsData := globalOptsData{
 		init: opts.Initialization{
-			Width:  px(cfg.w),
-			Height: px(cfg.h),
+			Width:      px(cfg.w),
+			Height:     px(cfg.h),
+			AssetsHost: cfg.assetsHost,
 		},
 		tooltip: opts.Tooltip{
 			Show:      true,
@@ -315,7 +316,8 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 			Color0:       colorDownBar,
 			BorderColor:  colorUpBar,
 			BorderColor0: colorDownBar,
-		}))
+		}),
+	)
 
 	eventDescMap := map[string]string{}
 	for _, e := range events {
@@ -367,7 +369,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		}))
 	chart.Overlap(bar)
 
-	page := components.NewPage().AddCharts(chart)
+	page := components.NewPage(c.cfg.assetsHost).AddCharts(chart)
 	fp, err := os.Create(path)
 	if err != nil {
 		return err

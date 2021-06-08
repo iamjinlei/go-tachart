@@ -31,11 +31,12 @@ type Page struct {
 }
 
 // NewPage creates a new page.
-func NewPage() *Page {
+func NewPage(assetsHost string) *Page {
 	page := &Page{}
 	page.Assets.InitAssets()
 	page.Renderer = render.NewPageRender(page, page.Validate)
 	page.Layout = PageCenterLayout
+	page.AssetsHost = assetsHost
 	return page
 }
 
@@ -49,11 +50,11 @@ func (page *Page) AddCharts(charts ...Charter) *Page {
 	for i := 0; i < len(charts); i++ {
 		assets := charts[i].GetAssets()
 		for _, v := range assets.JSAssets.Values {
-			page.JSAssets.Add(v)
+			page.JSAssets.Add(string(v))
 		}
 
 		for _, v := range assets.CSSAssets.Values {
-			page.CSSAssets.Add(v)
+			page.CSSAssets.Add(string(v))
 		}
 		charts[i].Validate()
 		page.Charts = append(page.Charts, charts[i])
