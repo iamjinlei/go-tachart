@@ -128,7 +128,6 @@ func main() {
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access
 
-	c, _ := tachart.New(*cfg)
-
+	c := tachart.New(*cfg)
 	c.GenStatic(cdls, events, "/Volumes/tmpfs/tmp/kline.html")
 }

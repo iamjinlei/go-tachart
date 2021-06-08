@@ -81,7 +81,7 @@ type TAChart struct {
 	gridLayouts    []gridLayout
 }
 
-func New(cfg Config) (*TAChart, error) {
+func New(cfg Config) *TAChart {
 	decimalPlaces := fmt.Sprintf("%v", cfg.precision)
 	minRoundFunc := strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
 	maxRoundFunc := strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
@@ -302,7 +302,7 @@ func New(cfg Config) (*TAChart, error) {
 		extendedXAxis:  extendedXAxis,
 		extendedYAxis:  extendedYAxis,
 		gridLayouts:    gridLayouts,
-	}, nil
+	}
 }
 
 func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {

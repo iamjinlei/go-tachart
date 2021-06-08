@@ -72,24 +72,18 @@ func main() {
 	}
 
 	cfg := tachart.NewConfig().
+		SetWidth(1080).
+		SetHeight(800).
 		AddOverlay(
-			tachart.IndicatorConfig{
-				Type:  tachart.SMA,
-				Param: "5",
-			},
-			tachart.IndicatorConfig{
-				Type:  tachart.SMA,
-				Param: "20",
-			}).
+			tachart.NewSMA(5),
+			tachart.NewSMA(20),
+		).
 		AddIndicator(
-			tachart.IndicatorConfig{
-				Type:  tachart.MACD,
-				Param: "12,26,9",
-			}).
-        UserRepoAssets() // serving assets from current repo, avoid network access
+			tachart.NewMACD(12, 26, 9),
+		).
+		UseRepoAssets() // serving assets file from current repo, avoid network access
 
-	c, _ := tachart.New(*cfg)
-
-	c.GenStatic(cdls, events, "/tmp/demo.html")
+	c := tachart.New(*cfg)
+	c.GenStatic(cdls, events, "/Volumes/tmpfs/tmp/kline.html")
 }
 ```
