@@ -18,9 +18,10 @@ type Page struct {
 	opts.Initialization
 	opts.Assets
 
-	Layout    Layout
-	Charts    []interface{}
-	ChartArea ChartLayout
+	PageBackgroundColor string
+	Layout              Layout
+	Charts              []interface{}
+	ChartArea           ChartLayout
 }
 
 // NewPage creates a new page.
@@ -31,12 +32,18 @@ func NewPage(assetsHost string) *Page {
 	page.Renderer = render.NewPageRender(page, page.Validate)
 	page.AssetsHost = assetsHost
 	page.ChartArea = PageCenterLayout
+	page.PageBackgroundColor = "#FFFFFF"
 
 	return page
 }
 
 func (page *Page) SetLayout(layout Layout) *Page {
 	page.Layout = layout
+	return page
+}
+
+func (page *Page) SetBackgroundColor(color string) *Page {
+	page.PageBackgroundColor = color
 	return page
 }
 

@@ -5,7 +5,7 @@ var PageTpl = `
 <!DOCTYPE html>
 <html>
     {{- template "header" . }}
-<body>
+<body style="background-color:{{ .PageBackgroundColor }}">
 
 <div id="grid_container" style="display:grid;grid-template-columns:{{ .Layout.TemplateColumns }};justify-content:center;">
 

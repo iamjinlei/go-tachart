@@ -64,6 +64,12 @@ const (
 
 var (
 	ErrDuplicateCandleLabel = errors.New("candles with duplicated labels")
+
+	// TODO: complete the map for all themes
+	pageBgColorMap = map[Theme]string{
+		ThemeWhite:   "#FFFFFF",
+		ThemeVintage: "#FEF8EF",
+	}
 )
 
 type gridLayout struct {
@@ -424,8 +430,15 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		LeftContent:     template.HTML(c.cfg.layout.leftContent),
 		RightContent:    template.HTML(c.cfg.layout.rightContent),
 	}
+
+	pageBgColor := pageBgColorMap[c.cfg.theme]
+	if pageBgColor == "" {
+		pageBgColor = "#FFFFFF"
+	}
+
 	return components.NewPage(c.cfg.assetsHost).
 		SetLayout(layout).
+		SetBackgroundColor(pageBgColor).
 		AddCharts(chart).
 		Render(fp)
 }

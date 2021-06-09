@@ -137,11 +137,12 @@ bottom bar
 </div>
 `
 	cfg := tachart.NewConfig().
+		SetTheme(tachart.ThemeVintage).
 		SetChartWidth(900).
 		SetChartHeight(600).
 		SetTopRowContent(top, 100).
 		SetBottomRowContent(bottom, 50).
-		SetLeftColContent(left, 60).
+		SetLeftColContent(left, 70).
 		SetRightColContent(right, 300).
 		AddOverlay(
 			tachart.NewSMA(5),
