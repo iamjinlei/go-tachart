@@ -407,6 +407,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 			YAxisIndex: len(c.cfg.indicators) + 2,
 		}))
 	chart.Overlap(bar)
+	chart.AddJSFuncs(c.cfg.jsFuncs...)
 
 	fp, err := os.Create(path)
 	if err != nil {

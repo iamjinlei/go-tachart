@@ -36,6 +36,7 @@ type Config struct {
 	assetsHost string
 	theme      Theme
 	layout     pageLayout
+	jsFuncs    []string
 }
 
 func NewConfig() *Config {
@@ -88,6 +89,11 @@ func (c *Config) SetLeftColContent(content string, w int) *Config {
 func (c *Config) SetRightColContent(content string, w int) *Config {
 	c.layout.rightContent = template.HTML(content)
 	c.layout.rightWidth = w
+	return c
+}
+
+func (c *Config) AddJSFunc(js string) *Config {
+	c.jsFuncs = append(c.jsFuncs, js)
 	return c
 }
 

@@ -1053,13 +1053,13 @@ var funcPat = regexp.MustCompile(`\n|\t`)
 const funcMarker = "__f__"
 
 type JSFunctions struct {
-	Fns []string
+	Fns []template.JS
 }
 
 // AddJSFuncs adds a new JS function.
 func (f *JSFunctions) AddJSFuncs(fn ...string) {
 	for i := 0; i < len(fn); i++ {
-		f.Fns = append(f.Fns, funcPat.ReplaceAllString(fn[i], ""))
+		f.Fns = append(f.Fns, template.JS(funcPat.ReplaceAllString(fn[i], "")))
 	}
 }
 
