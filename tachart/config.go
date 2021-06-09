@@ -12,6 +12,7 @@ type Config struct {
 	overlays   []Indicator
 	indicators []Indicator
 	assetsHost string
+	theme      Theme
 }
 
 func NewConfig() *Config {
@@ -22,6 +23,7 @@ func NewConfig() *Config {
 		overlays:   []Indicator{},
 		indicators: []Indicator{},
 		assetsHost: "https://go-echarts.github.io/go-echarts-assets/assets/",
+		theme:      ThemeWhite,
 	}
 }
 
@@ -32,6 +34,11 @@ func (c *Config) SetWidth(w int) *Config {
 
 func (c *Config) SetHeight(h int) *Config {
 	c.h = h
+	return c
+}
+
+func (c *Config) SetTheme(t Theme) *Config {
+	c.theme = t
 	return c
 }
 

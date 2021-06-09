@@ -202,11 +202,13 @@ func (c macd) genChart(vals []float64, xAxis interface{}, gridIndex int, _ strin
 	barItems := []opts.BarData{}
 	for _, v := range hist {
 		style := &opts.ItemStyle{
-			Color: colorUpBar,
+			Color:   colorUpBar,
+			Opacity: opacity,
 		}
 		if v < 0 {
 			style = &opts.ItemStyle{
-				Color: colorDownBar,
+				Color:   colorDownBar,
+				Opacity: opacity,
 			}
 		}
 		barItems = append(barItems, opts.BarData{Value: v, ItemStyle: style})

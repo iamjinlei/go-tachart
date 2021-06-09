@@ -229,6 +229,7 @@ func New(cfg Config) *TAChart {
 
 	globalOptsData := globalOptsData{
 		init: opts.Initialization{
+			Theme:      string(cfg.theme),
 			Width:      px(cfg.w),
 			Height:     px(cfg.h),
 			AssetsHost: cfg.assetsHost,
@@ -318,11 +319,13 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		closes = append(closes, cdl.C)
 
 		style := &opts.ItemStyle{
-			Color: colorUpBar,
+			Color:   colorUpBar,
+			Opacity: opacity,
 		}
 		if cdl.O > cdl.C {
 			style = &opts.ItemStyle{
-				Color: colorDownBar,
+				Color:   colorDownBar,
+				Opacity: opacity,
 			}
 		}
 		volSeries = append(volSeries, opts.BarData{
@@ -350,6 +353,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 			Color0:       colorDownBar,
 			BorderColor:  colorUpBar,
 			BorderColor0: colorDownBar,
+			Opacity:      opacity,
 		}),
 	)
 
