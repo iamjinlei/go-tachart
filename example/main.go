@@ -103,12 +103,12 @@ var (
 			Description: "go long on " + cdls[30].Label,
 		},
 		{
-			Type:        tachart.Short,
+			Type:        tachart.Open,
 			Label:       cdls[60].Label,
-			Description: "This is a demo event description. Randomly pick this candle to go short on " + cdls[40].Label,
+			Description: "This is a demo event description. Randomly pick this candle to open position on " + cdls[40].Label,
 		},
 		{
-			Type:        tachart.Long,
+			Type:        tachart.Short,
 			Label:       cdls[71].Label,
 			Description: "go short on " + cdls[61].Label,
 		},

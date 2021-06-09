@@ -11,6 +11,8 @@ type EventType byte
 const (
 	Long  EventType = 'L'
 	Short EventType = 'S'
+	Open  EventType = 'O'
+	Close EventType = 'C'
 )
 
 type eventStyle struct {
@@ -22,9 +24,8 @@ var (
 	eventLabelMap = map[EventType]*eventStyle{
 		Long: &eventStyle{
 			label: &opts.Label{
-				Show:  true,
-				Color: "#FFFFFF",
-				//BackgroundColor: colorUpBar,
+				Show:      true,
+				Color:     "#FFFFFF",
 				Formatter: fmt.Sprintf("%c", Long),
 			},
 			style: &opts.ItemStyle{
@@ -34,14 +35,35 @@ var (
 		},
 		Short: &eventStyle{
 			label: &opts.Label{
-				Show:  true,
-				Color: "#0000FF",
-				// BackgroundColor: colorDownBar,
+				Show:      true,
+				Color:     "#0000FF",
 				Formatter: fmt.Sprintf("%c", Short),
 			},
 			style: &opts.ItemStyle{
 				Color:       colorDownBar,
 				BorderColor: colorDownBar,
+			},
+		},
+		Open: &eventStyle{
+			label: &opts.Label{
+				Show:      true,
+				Color:     "#FFFFFF",
+				Formatter: fmt.Sprintf("%c", Open),
+			},
+			style: &opts.ItemStyle{
+				Color:       "#1D8348",
+				BorderColor: "#1D8348",
+			},
+		},
+		Close: &eventStyle{
+			label: &opts.Label{
+				Show:      true,
+				Color:     "#FFFFFF",
+				Formatter: fmt.Sprintf("%c", Close),
+			},
+			style: &opts.ItemStyle{
+				Color:       "#943126",
+				BorderColor: "#943126",
 			},
 		},
 	}
