@@ -116,9 +116,33 @@ var (
 )
 
 func main() {
+	top := `
+<div style="border:2px solid blue;text-align:center;font-size:40px;height:80px;line-height:80px;">
+Candlestick Chart Demo
+</div>
+`
+	left := `
+<div style="border:1px solid black;text-align:center;font-size:20px;width:60px;height:600px;">
+left column
+</div>
+`
+	right := `
+<div style="border:1px solid black;text-align:center;font-size:20px;width:300px;height:600px;">
+right column
+</div>
+`
+	bottom := `
+<div style="border:1px solid black;text-align:center;font-size:20px;margin:10px 0px;height:30px;line-height:30px;">
+bottom bar
+</div>
+`
 	cfg := tachart.NewConfig().
-		SetWidth(1080).
-		SetHeight(800).
+		SetChartWidth(900).
+		SetChartHeight(600).
+		SetTopRowContent(top, 100).
+		SetBottomRowContent(bottom, 50).
+		SetLeftColContent(left, 60).
+		SetRightColContent(right, 300).
 		AddOverlay(
 			tachart.NewSMA(5),
 			tachart.NewSMA(20),

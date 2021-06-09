@@ -5,14 +5,6 @@ import (
 	"github.com/iamjinlei/go-tachart/render"
 )
 
-type Layout string
-
-const (
-	PageNoneLayout   Layout = "none"
-	PageCenterLayout Layout = "center"
-	PageFlexLayout   Layout = "flex"
-)
-
 // Charter
 type Charter interface {
 	Type() string
@@ -26,17 +18,20 @@ type Page struct {
 	opts.Initialization
 	opts.Assets
 
-	Charts []interface{}
-	Layout Layout
+	Layout    Layout
+	Charts    []interface{}
+	ChartArea ChartLayout
 }
 
 // NewPage creates a new page.
 func NewPage(assetsHost string) *Page {
 	page := &Page{}
 	page.Assets.InitAssets()
+
 	page.Renderer = render.NewPageRender(page, page.Validate)
-	page.Layout = PageCenterLayout
 	page.AssetsHost = assetsHost
+	page.ChartArea = PageCenterLayout
+
 	return page
 }
 

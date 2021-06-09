@@ -3,6 +3,7 @@ package tachart
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"os"
 	"strings"
 
@@ -104,7 +105,7 @@ func New(cfg Config) *TAChart {
 	sliderH := 70
 	gap := 40
 
-	h := (cfg.h - sliderH) / (len(cfg.indicators) + 1 + 2)
+	h := (cfg.layout.chartHeight - sliderH) / (len(cfg.indicators) + 1 + 2)
 	// candlestick+overlay
 	cdlChartTop := 20
 	// event
@@ -230,8 +231,8 @@ func New(cfg Config) *TAChart {
 	globalOptsData := globalOptsData{
 		init: opts.Initialization{
 			Theme:      string(cfg.theme),
-			Width:      px(cfg.w),
-			Height:     px(cfg.h),
+			Width:      px(cfg.layout.chartWidth),
+			Height:     px(cfg.layout.chartHeight),
 			AssetsHost: cfg.assetsHost,
 		},
 		tooltip: opts.Tooltip{
@@ -407,14 +408,25 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		}))
 	chart.Overlap(bar)
 
-	page := components.NewPage(c.cfg.assetsHost).AddCharts(chart)
 	fp, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer fp.Close()
 
-	return page.Render(fp)
+	layout := components.Layout{
+		TemplateColumns: template.CSS(fmt.Sprintf("%vpx %vpx %vpx", c.cfg.layout.leftWidth, c.cfg.layout.chartWidth, c.cfg.layout.rightWidth)),
+		TopHeight:       template.CSS(px(c.cfg.layout.topHeight)),
+		BottomHeight:    template.CSS(px(c.cfg.layout.bottomHeight)),
+		TopContent:      template.HTML(c.cfg.layout.topContent),
+		BottomContent:   template.HTML(c.cfg.layout.bottomContent),
+		LeftContent:     template.HTML(c.cfg.layout.leftContent),
+		RightContent:    template.HTML(c.cfg.layout.rightContent),
+	}
+	return components.NewPage(c.cfg.assetsHost).
+		SetLayout(layout).
+		AddCharts(chart).
+		Render(fp)
 }
 
 func px(v int) string {

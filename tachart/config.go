@@ -1,44 +1,93 @@
 package tachart
 
 import (
+	"html/template"
 	"path/filepath"
 	"runtime"
 )
 
+// page is conceptually divided into 3x3 grids:
+// ----------------------------------------------
+//                      top
+// ----------------------------------------------
+//           |                       |
+//    left   |          chart        |   right
+//           |                       |
+// ----------------------------------------------
+//                      bottom
+// ----------------------------------------------
+type pageLayout struct {
+	chartWidth    int
+	chartHeight   int
+	topContent    template.HTML
+	topHeight     int
+	bottomContent template.HTML
+	bottomHeight  int
+	leftContent   template.HTML
+	leftWidth     int
+	rightContent  template.HTML
+	rightWidth    int
+}
+
 type Config struct {
-	w          int
-	h          int
 	precision  int // decimal places of floating nubmers shown on chart
 	overlays   []Indicator
 	indicators []Indicator
 	assetsHost string
 	theme      Theme
+	layout     pageLayout
 }
 
 func NewConfig() *Config {
 	return &Config{
-		w:          900,
-		h:          500,
 		precision:  2,
 		overlays:   []Indicator{},
 		indicators: []Indicator{},
 		assetsHost: "https://go-echarts.github.io/go-echarts-assets/assets/",
 		theme:      ThemeWhite,
+		layout: pageLayout{
+			chartWidth:  900,
+			chartHeight: 500,
+		},
 	}
-}
-
-func (c *Config) SetWidth(w int) *Config {
-	c.w = w
-	return c
-}
-
-func (c *Config) SetHeight(h int) *Config {
-	c.h = h
-	return c
 }
 
 func (c *Config) SetTheme(t Theme) *Config {
 	c.theme = t
+	return c
+}
+
+func (c *Config) SetChartWidth(w int) *Config {
+	c.layout.chartWidth = w
+	return c
+}
+
+func (c *Config) SetChartHeight(h int) *Config {
+	c.layout.chartHeight = h
+	return c
+}
+
+func (c *Config) SetTopRowContent(content string, h int) *Config {
+	c.layout.topContent = template.HTML(content)
+	c.layout.topHeight = h
+	return c
+}
+
+func (c *Config) SetBottomRowContent(content string, h int) *Config {
+	c.layout.bottomContent = template.HTML(content)
+	c.layout.bottomHeight = h
+	return c
+}
+
+func (c *Config) SetLeftColContent(content string, w int) *Config {
+	c.layout.leftContent = template.HTML(content)
+	c.layout.leftWidth = w
+	return c
+}
+
+func (c *Config) SetRightColContent(content string, w int) *Config {
+	c.layout.rightContent = template.HTML(content)
+	c.layout.rightWidth = w
 	return c
 }
 
