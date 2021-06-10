@@ -1,8 +1,8 @@
 package tachart
 
 const (
-	colorDownBar = "#00DA3C"
-	colorUpBar   = "#EC0000"
+	colorUpBar   = "#00DA3C"
+	colorDownBar = "#EC0000"
 	opacity      = 0.7
 )
 
