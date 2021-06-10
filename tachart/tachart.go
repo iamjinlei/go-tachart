@@ -29,6 +29,7 @@ const (
 			var title = (sz,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;font-weight:bold;">'+txt+'</span>';
 			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;">'+sign+'</span>'+txt+'</span>';
 			var wrap = (sz,txt,width) => '<span style="display:inline-block;width:'+width+'px;word-break:break-word;word-wrap:break-word;white-space:pre-wrap;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
+			var nowrap = (sz,txt) => '<span style="display:inline-block;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 
 			value.sort((a, b) => a.seriesIndex -b.seriesIndex);
 			var cdl = value[0];
@@ -44,7 +45,11 @@ const (
 
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
-				ret += '<hr>' + wrap(13,desc,160);
+				if (__WRAP_DESC__) {
+					ret += '<hr>' + wrap(13,desc,__WRAP_WIDTH__);
+				} else {
+					ret += '<hr>' + nowrap(13,desc);
+				}
 			}
 			return ret;
 		}`
@@ -94,6 +99,13 @@ func New(cfg Config) *TAChart {
 	maxRoundFunc := strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
 	yLabelFormatterFunc := strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
 	tooltipFormatterFunc := strings.Replace(tooltipFormatterFuncTpl, "__DECIMAL_PLACES__", decimalPlaces, -1)
+	if cfg.eventDescWrapWidth == 0 {
+		tooltipFormatterFunc = strings.Replace(tooltipFormatterFunc, "__WRAP_DESC__", "false", -1)
+		tooltipFormatterFunc = strings.Replace(tooltipFormatterFunc, "__WRAP_WIDTH__", "0", -1)
+	} else {
+		tooltipFormatterFunc = strings.Replace(tooltipFormatterFunc, "__WRAP_DESC__", "true", -1)
+		tooltipFormatterFunc = strings.Replace(tooltipFormatterFunc, "__WRAP_WIDTH__", fmt.Sprintf("%v", cfg.eventDescWrapWidth), -1)
+	}
 
 	// grid layuout: N = len(indicators) + 1
 	// ----------------------------------------

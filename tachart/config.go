@@ -30,13 +30,14 @@ type pageLayout struct {
 }
 
 type Config struct {
-	precision  int // decimal places of floating nubmers shown on chart
-	overlays   []Indicator
-	indicators []Indicator
-	assetsHost string
-	theme      Theme
-	layout     pageLayout
-	jsFuncs    []string
+	precision          int // decimal places of floating nubmers shown on chart
+	overlays           []Indicator
+	indicators         []Indicator
+	assetsHost         string
+	theme              Theme
+	layout             pageLayout
+	eventDescWrapWidth int // wrap width of event desc on tooltip, 0 means no-wrap
+	jsFuncs            []string
 }
 
 func NewConfig() *Config {
@@ -50,6 +51,7 @@ func NewConfig() *Config {
 			chartWidth:  900,
 			chartHeight: 500,
 		},
+		eventDescWrapWidth: 160,
 	}
 }
 
@@ -89,6 +91,11 @@ func (c *Config) SetLeftColContent(content string, w int) *Config {
 func (c *Config) SetRightColContent(content string, w int) *Config {
 	c.layout.rightContent = template.HTML(content)
 	c.layout.rightWidth = w
+	return c
+}
+
+func (c *Config) SetEventDescWrapWidth(w int) *Config {
+	c.eventDescWrapWidth = w
 	return c
 }
 
