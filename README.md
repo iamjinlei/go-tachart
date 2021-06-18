@@ -37,7 +37,7 @@ More TA chart and event types will be added to support a wide-range of use cases
 
 
 #### Candlestick chart with moving average overlay on top + additional indicators
-!![Screen Shot 2021-06-08 at 12 04 45 PM](https://user-images.githubusercontent.com/6463139/121121350-ff88e580-c851-11eb-8857-8691c2bb7925.png)
+![Screen Shot 2021-06-08 at 12 04 45 PM](https://user-images.githubusercontent.com/6463139/121121350-ff88e580-c851-11eb-8857-8691c2bb7925.png)
 
 
 ### Usage
