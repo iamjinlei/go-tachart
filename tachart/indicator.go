@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/markcheno/go-talib"
+	"github.com/iamjinlei/go-tart"
 
 	"github.com/iamjinlei/go-tachart/charts"
 	"github.com/iamjinlei/go-tachart/opts"
@@ -26,23 +26,23 @@ type Indicator interface {
 
 type ma struct {
 	nm string
-	n  int
-	fn func([]float64, int) []float64
+	n  int64
+	fn func([]float64, int64) []float64
 }
 
 func NewSMA(n int) Indicator {
 	return ma{
 		nm: fmt.Sprintf("SMA(%v)", n),
-		n:  n,
-		fn: talib.Sma,
+		n:  int64(n),
+		fn: tart.SmaArr,
 	}
 }
 
 func NewEMA(n int) Indicator {
 	return ma{
 		nm: fmt.Sprintf("EMA(%v)", n),
-		n:  n,
-		fn: talib.Ema,
+		n:  int64(n),
+		fn: tart.EmaArr,
 	}
 }
 
@@ -78,7 +78,7 @@ func (c ma) getTitleOpts(top, left int, color string) []opts.Title {
 
 func (c ma) genChart(vals []float64, xAxis interface{}, gridIndex int, color string) charts.Overlaper {
 	ma := c.fn(vals, c.n)
-	for i := 0; i < c.n; i++ {
+	for i := 0; i < int(c.n); i++ {
 		ma[i] = ma[c.n]
 	}
 
@@ -107,17 +107,17 @@ func (c ma) genChart(vals []float64, xAxis interface{}, gridIndex int, color str
 
 type macd struct {
 	nm     string
-	fast   int
-	slow   int
-	signal int
+	fast   int64
+	slow   int64
+	signal int64
 }
 
 func NewMACD(fast, slow, signal int) Indicator {
 	return macd{
 		nm:     fmt.Sprintf("MACD(%v,%v,%v)", fast, slow, signal),
-		fast:   fast,
-		slow:   slow,
-		signal: signal,
+		fast:   int64(fast),
+		slow:   int64(slow),
+		signal: int64(signal),
 	}
 }
 
@@ -161,7 +161,7 @@ func (c macd) getTitleOpts(top, left int, _ string) []opts.Title {
 }
 
 func (c macd) genChart(vals []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
-	macd, signal, hist := talib.Macd(vals, c.fast, c.slow, c.signal)
+	macd, signal, hist := tart.MacdArr(vals, c.fast, c.slow, c.signal)
 
 	lineItems := []opts.LineData{}
 	for _, v := range macd {
