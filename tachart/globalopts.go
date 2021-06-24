@@ -22,7 +22,7 @@ type globalOptsData struct {
 	grids       []opts.Grid
 	xAxis       opts.XAxis // candlestick+overlay
 	yAxis       opts.YAxis // candlestick+overlay
-	dataZoom    opts.DataZoom
+	dataZooms   []opts.DataZoom
 }
 
 func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]string) []charts.GlobalOpts {
@@ -34,8 +34,11 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 	if pct == 0 {
 		pct = 0.1
 	}
-	dataZoom := c.dataZoom
-	dataZoom.Start = dataZoom.End - pct
+	dataZooms := []opts.DataZoom{}
+	for _, dz := range c.dataZooms {
+		dz.Start = dz.End - pct
+		dataZooms = append(dataZooms, dz)
+	}
 
 	return []charts.GlobalOpts{
 		charts.WithTitleOpts(c.titles...),
@@ -45,7 +48,7 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 		charts.WithGridOpts(c.grids...),
 		charts.WithXAxisOpts(c.xAxis),
 		charts.WithYAxisOpts(c.yAxis),
-		charts.WithDataZoomOpts(dataZoom),
+		charts.WithDataZoomOpts(dataZooms...),
 	}
 }
 

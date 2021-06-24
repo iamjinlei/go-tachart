@@ -80,7 +80,7 @@ var (
 	left = 80
 	// right margin
 	right   = 40
-	sliderH = 70
+	sliderH = 85
 	// vertical gap between charts
 	gap = 20
 )
@@ -292,11 +292,23 @@ func New(cfg Config) *TAChart {
 				Formatter:    opts.FuncOpts(yLabelFormatterFunc),
 			},
 		},
-		dataZoom: opts.DataZoom{
-			Start:      50,
-			End:        100,
-			XAxisIndex: xAxisIndex,
+		dataZooms: []opts.DataZoom{
+			opts.DataZoom{
+				Type:       "slider",
+				Start:      50,
+				End:        100,
+				XAxisIndex: xAxisIndex,
+			},
 		},
+	}
+	if cfg.draggable {
+		globalOptsData.dataZooms = append(globalOptsData.dataZooms,
+			opts.DataZoom{
+				Type:       "inside",
+				Start:      50,
+				End:        100,
+				XAxisIndex: xAxisIndex,
+			})
 	}
 
 	layout := gridLayouts[0]

@@ -155,6 +155,7 @@ bottom bar
 		SetBottomRowContent(bottom, 50).
 		SetLeftColContent(left, 70).
 		SetRightColContent(right, 300).
+		SetDraggable(true).
 		AddOverlay(
 			tachart.NewSMA(5),
 			tachart.NewSMA(20),

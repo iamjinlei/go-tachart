@@ -36,6 +36,7 @@ type Config struct {
 	assetsHost         string
 	theme              Theme
 	layout             pageLayout
+	draggable          bool
 	eventDescWrapWidth int // wrap width of event desc on tooltip, 0 means no-wrap
 	jsFuncs            []string
 }
@@ -51,6 +52,7 @@ func NewConfig() *Config {
 			chartWidth:  900,
 			chartHeight: 500,
 		},
+		draggable:          false,
 		eventDescWrapWidth: 160,
 	}
 }
@@ -91,6 +93,11 @@ func (c *Config) SetLeftColContent(content string, w int) *Config {
 func (c *Config) SetRightColContent(content string, w int) *Config {
 	c.layout.rightContent = template.HTML(content)
 	c.layout.rightWidth = w
+	return c
+}
+
+func (c *Config) SetDraggable(draggable bool) *Config {
+	c.draggable = draggable
 	return c
 }
 
