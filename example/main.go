@@ -161,6 +161,7 @@ bottom bar
 		).
 		AddIndicator(
 			tachart.NewMACD(12, 26, 9),
+			tachart.NewRSI(14, 30, 70),
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access
 

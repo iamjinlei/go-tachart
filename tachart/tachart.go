@@ -75,6 +75,14 @@ var (
 		ThemeWhite:   "#FFFFFF",
 		ThemeVintage: "#FEF8EF",
 	}
+
+	// left margin
+	left = 80
+	// right margin
+	right   = 40
+	sliderH = 70
+	// vertical gap between charts
+	gap = 20
 )
 
 type gridLayout struct {
@@ -117,11 +125,6 @@ func New(cfg Config) *TAChart {
 	// ----------------------------------------
 	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
-
-	left := 80
-	right := 40
-	sliderH := 70
-	gap := 40
 
 	h := (cfg.layout.chartHeight - sliderH) / (len(cfg.indicators) + 1 + 2)
 	// candlestick+overlay
@@ -173,7 +176,7 @@ func New(cfg Config) *TAChart {
 	}
 
 	// indicator & vol chart, inddex starting from 2
-	top := cdlChartTop + h*2 + gap
+	top := cdlChartTop + h*2 + gap*2
 	for i := 0; i < len(cfg.indicators)+1; i++ {
 		gridIndex := i + 2
 		grids = append(grids, opts.Grid{
@@ -233,7 +236,7 @@ func New(cfg Config) *TAChart {
 			Scale:       true,
 			SplitNumber: 2,
 			SplitLine: &opts.SplitLine{
-				Show: false,
+				Show: true,
 			},
 			AxisLabel: &opts.AxisLabel{
 				Show:         true,
@@ -329,22 +332,30 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 	xAxis := make([]string, 0)
 	klineSeries := []opts.KlineData{}
 	volSeries := []opts.BarData{}
+	opens := []float64{}
+	highs := []float64{}
+	lows := []float64{}
 	closes := []float64{}
+	vols := []float64{}
 	cdlMap := map[string]*Candle{}
 	for _, cdl := range cdls {
 		xAxis = append(xAxis, cdl.Label)
 		// open,close,low,high
 		klineSeries = append(klineSeries, opts.KlineData{Value: []float64{cdl.O, cdl.C, cdl.L, cdl.H}})
+		opens = append(opens, cdl.O)
+		highs = append(highs, cdl.H)
+		lows = append(lows, cdl.V)
 		closes = append(closes, cdl.C)
+		vols = append(vols, cdl.V)
 
 		style := &opts.ItemStyle{
 			Color:   colorUpBar,
-			Opacity: opacity,
+			Opacity: opacityHeavy,
 		}
 		if cdl.O > cdl.C {
 			style = &opts.ItemStyle{
 				Color:   colorDownBar,
-				Opacity: opacity,
+				Opacity: opacityHeavy,
 			}
 		}
 		volSeries = append(volSeries, opts.BarData{
@@ -372,7 +383,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 			Color0:       colorDownBar,
 			BorderColor:  colorUpBar,
 			BorderColor0: colorDownBar,
-			Opacity:      opacity,
+			Opacity:      opacityHeavy,
 		}),
 	)
 
@@ -381,10 +392,10 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		eventDescMap[e.Label] = e.Description
 	}
 
-	chart.SetGlobalOptions(c.globalOptsData.genOpts(eventDescMap)...)
+	chart.SetGlobalOptions(c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)...)
 
 	for i, ol := range c.cfg.overlays {
-		chart.Overlap(ol.genChart(closes, xAxis, 0, lineColors[i]))
+		chart.Overlap(ol.genChart(opens, highs, lows, closes, vols, xAxis, 0, lineColors[i]))
 	}
 
 	for i := 0; i < len(c.extendedXAxis); i++ {
@@ -418,7 +429,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 
 	// grid index starting from 2 (candlestick+event)
 	for i, ind := range c.cfg.indicators {
-		chart.Overlap(ind.genChart(closes, xAxis, i+2, ""))
+		chart.Overlap(ind.genChart(opens, highs, lows, closes, vols, xAxis, i+2, ""))
 	}
 
 	bar := charts.NewBar().

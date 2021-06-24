@@ -3,7 +3,9 @@ package tachart
 const (
 	colorUpBar   = "#00DA3C"
 	colorDownBar = "#EC0000"
-	opacity      = 0.7
+	opacityHeavy = 0.7
+	opacityMed   = 0.5
+	opacityLight = 0.3
 )
 
 var (

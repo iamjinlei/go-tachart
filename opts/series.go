@@ -115,6 +115,9 @@ type MarkLineStyle struct {
 
 	// Mark line text options.
 	Label *Label `json:"label,omitempty"`
+
+	// Mark line style
+	LineStyle *LineStyle `json:"lineStyle,omitempty"`
 }
 
 // MarkLineNameTypeItem represents type for a MarkLine.
