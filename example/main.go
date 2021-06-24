@@ -100,17 +100,28 @@ var (
 		{
 			Type:        tachart.Long,
 			Label:       cdls[55].Label,
-			Description: "go long on " + cdls[30].Label,
+			Description: "go long on " + cdls[55].Label,
 		},
 		{
 			Type:        tachart.Open,
 			Label:       cdls[60].Label,
-			Description: "This is a demo event description. Randomly pick this candle to open position on " + cdls[40].Label,
+			Description: "This is a demo event description. Randomly pick this candle to open position on " + cdls[60].Label,
+		},
+		{
+			Type:        tachart.CustomEvent,
+			Label:       cdls[65].Label,
+			Description: "This is a user defined event demo, which custom event mark and color",
+			EventMark: tachart.EventMark{
+				Name:       "CM",
+				FontColor:  "#000000",
+				BgColor:    "#AAAAAA",
+				SymbolSize: 32,
+			},
 		},
 		{
 			Type:        tachart.Short,
 			Label:       cdls[71].Label,
-			Description: "go short on " + cdls[61].Label,
+			Description: "go short on " + cdls[71].Label,
 		},
 	}
 )

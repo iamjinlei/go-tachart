@@ -401,12 +401,16 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		}),
 	}
 	for _, e := range events {
+		es := eventLabelMap[e.Type]
+		if e.Type == CustomEvent {
+			es = e.EventMark.toEventStyle()
+		}
 		evtOpts = append(evtOpts, charts.WithMarkPointNameCoordItemOpts(opts.MarkPointNameCoordItem{
 			Symbol:     "roundRect",
-			SymbolSize: 16,
+			SymbolSize: es.symbolSize,
 			Coordinate: []interface{}{e.Label, 0},
-			Label:      eventLabelMap[e.Type].label,
-			ItemStyle:  eventLabelMap[e.Type].style,
+			Label:      es.label,
+			ItemStyle:  es.style,
 		}))
 	}
 	event := charts.NewBar().AddSeries("events", []opts.BarData{}, evtOpts...)
