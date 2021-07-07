@@ -127,6 +127,11 @@ var (
 )
 
 func main() {
+	vals := []float64{}
+	for _, cdl := range cdls {
+		vals = append(vals, float64(int64(cdl.C)%100))
+	}
+
 	top := `
 <div style="border:2px solid blue;text-align:center;font-size:40px;height:80px;line-height:80px;">
 Candlestick Chart Demo
@@ -163,6 +168,7 @@ bottom bar
 		AddIndicator(
 			tachart.NewMACD(12, 26, 9),
 			tachart.NewRSI(14, 30, 70),
+			tachart.NewBoundedLine("bounded_line", vals, 0, 100, 20, 80),
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access
 
