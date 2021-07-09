@@ -155,7 +155,7 @@ bottom bar
 	cfg := tachart.NewConfig().
 		SetTheme(tachart.ThemeVintage).
 		SetChartWidth(900).
-		SetChartHeight(600).
+		SetChartHeight(800).
 		SetTopRowContent(top, 100).
 		SetBottomRowContent(bottom, 50).
 		SetLeftColContent(left, 70).
@@ -168,6 +168,7 @@ bottom bar
 		AddIndicator(
 			tachart.NewMACD(12, 26, 9),
 			tachart.NewRSI(14, 30, 70),
+			tachart.NewATR(5),
 			tachart.NewBoundedLine("bounded_line", vals, 0, 100, 20, 80),
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access

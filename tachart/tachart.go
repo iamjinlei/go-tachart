@@ -356,7 +356,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		klineSeries = append(klineSeries, opts.KlineData{Value: []float64{cdl.O, cdl.C, cdl.L, cdl.H}})
 		opens = append(opens, cdl.O)
 		highs = append(highs, cdl.H)
-		lows = append(lows, cdl.V)
+		lows = append(lows, cdl.L)
 		closes = append(closes, cdl.C)
 		vols = append(vols, cdl.V)
 
