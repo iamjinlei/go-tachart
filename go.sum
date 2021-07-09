@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/iamjinlei/go-tart v0.0.0-20210617113015-18f58647990a h1:imm5OTd+mi54FzbkUNIGCfn4AfeRWz0IGbORwhDNtIE=
 github.com/iamjinlei/go-tart v0.0.0-20210617113015-18f58647990a/go.mod h1:30Qg94n/KqLWfDL2OCY77Z1uNrY5DK9Oe0DyftSn8IU=
+github.com/iamjinlei/go-tart v0.0.0-20210623083942-ceb57e98706b h1:KfgXYALdIQOs1IQNUDzwBu3SM+3eNUR3T0C6sl626fU=
+github.com/iamjinlei/go-tart v0.0.0-20210623083942-ceb57e98706b/go.mod h1:30Qg94n/KqLWfDL2OCY77Z1uNrY5DK9Oe0DyftSn8IU=
 github.com/markcheno/go-talib v0.0.0-20190307022042-cd53a9264d70/go.mod h1:xsYvOKWtDWoDV0kdN3U8tYZ4lVrhjqf64cJRzR4ScTI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=

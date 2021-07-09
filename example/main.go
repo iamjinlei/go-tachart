@@ -127,11 +127,6 @@ var (
 )
 
 func main() {
-	vals := []float64{}
-	for _, cdl := range cdls {
-		vals = append(vals, float64(int64(cdl.C)%100))
-	}
-
 	top := `
 <div style="border:2px solid blue;text-align:center;font-size:40px;height:80px;line-height:80px;">
 Candlestick Chart Demo
@@ -152,6 +147,15 @@ right column
 bottom bar
 </div>
 `
+	vals0 := []float64{}
+	for _, cdl := range cdls {
+		vals0 = append(vals0, float64(int64(cdl.C)%100))
+	}
+	vals1 := []float64{}
+	for _, cdl := range cdls {
+		vals1 = append(vals1, float64(int64(cdl.C)%130))
+	}
+
 	cfg := tachart.NewConfig().
 		SetTheme(tachart.ThemeVintage).
 		SetChartWidth(900).
@@ -169,8 +173,8 @@ bottom bar
 			tachart.NewMACD(12, 26, 9),
 			tachart.NewRSI(14, 30, 70),
 			tachart.NewATR(5),
-			tachart.NewBoundedLine("custom_bounded_line", vals, 0, 100, 20, 80),
-			tachart.NewLine("custom_line", vals),
+			tachart.NewBoundedLine("custom_bounded_line", vals0, 0, 100, 20, 80),
+			tachart.NewLine2("double_line0", vals0, "double_line1", vals1),
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access
 
