@@ -166,8 +166,9 @@ bottom bar
 		SetRightColContent(right, 300).
 		SetDraggable(true).
 		AddOverlay(
-			tachart.NewSMA(5),
-			tachart.NewSMA(20),
+			//			tachart.NewSMA(5),
+			//			tachart.NewSMA(20),
+			tachart.NewBBandsSMA(20, 2),
 		).
 		AddIndicator(
 			tachart.NewMACD(12, 26, 9),
