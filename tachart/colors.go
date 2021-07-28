@@ -9,14 +9,22 @@ const (
 )
 
 var (
-	lineColors = []string{
+	colors = []string{
 		"#0000FF", // blue
-		"#FFBF00", // yellow variant
-		"#800080", // purple
-		"#DE3163", // red variant
-		"#008000", // green
+		"#FFA500", // orange
 		"#FF0000", // red
-		"#000080", // navy
+		"#00FF00", // lime
+		"#800080", // purple
+		"#00008B", // dark blue
+		"#000000", // black
+		"#FFBF00", // yellow variant
+		"#008000", // green
+		"#FF00FF", // magenta
+		"#808000", // olive
+		"#A52A2A", // brown
+		"#7FFD4",  // aquanmarine
 		"#800000", // maroon
+		"#DE3163", // red variant
+		"#000080", // navy
 	}
 )

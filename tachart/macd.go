@@ -15,10 +15,11 @@ type macd struct {
 	fast   int64
 	slow   int64
 	signal int64
+	ci     int
 }
 
 func NewMACD(fast, slow, signal int) Indicator {
-	return macd{
+	return &macd{
 		nm:     fmt.Sprintf("MACD(%v,%v,%v)", fast, slow, signal),
 		fast:   int64(fast),
 		slow:   int64(slow),
@@ -42,11 +43,16 @@ func (c macd) yAxisMax() string {
 	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 }
 
-func (c macd) getTitleOpts(top, left int, _ string) []opts.Title {
+func (c macd) getNumColors() int {
+	return 2
+}
+
+func (c *macd) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+	c.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[0],
+				Color:    colors[c.ci],
 				FontSize: chartLabelFontSize,
 			},
 			Title: c.nm + "-Diff",
@@ -55,7 +61,7 @@ func (c macd) getTitleOpts(top, left int, _ string) []opts.Title {
 		},
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[1],
+				Color:    colors[c.ci+1],
 				FontSize: chartLabelFontSize,
 			},
 			Title: c.nm + "-Sig",
@@ -65,7 +71,7 @@ func (c macd) getTitleOpts(top, left int, _ string) []opts.Title {
 	}
 }
 
-func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
+func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	macd, signal, hist := tart.MacdArr(closes, c.fast, c.slow, c.signal)
 
 	lineItems := []opts.LineData{}
@@ -82,7 +88,7 @@ func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridInde
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[0],
+				Color:   colors[c.ci],
 				Opacity: opacityMed,
 			}),
 		)
@@ -101,7 +107,7 @@ func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridInde
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[1],
+				Color:   colors[c.ci+1],
 				Opacity: opacityMed,
 			}),
 		)

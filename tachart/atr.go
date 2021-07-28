@@ -12,10 +12,11 @@ import (
 type atr struct {
 	nm string
 	n  int64
+	ci int
 }
 
 func NewATR(n int) Indicator {
-	return atr{
+	return &atr{
 		nm: fmt.Sprintf("ATR(%v)", n),
 		n:  int64(n),
 	}
@@ -37,11 +38,16 @@ func (a atr) yAxisMax() string {
 	return ""
 }
 
-func (a atr) getTitleOpts(top, left int, color string) []opts.Title {
+func (a atr) getNumColors() int {
+	return 1
+}
+
+func (a *atr) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+	a.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    color,
+				Color:    colors[a.ci],
 				FontSize: chartLabelFontSize,
 			},
 			Title: a.nm,
@@ -51,7 +57,7 @@ func (a atr) getTitleOpts(top, left int, color string) []opts.Title {
 	}
 }
 
-func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gridIndex int, color string) charts.Overlaper {
+func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	vols := tart.AtrArr(highs, lows, closes, a.n)
 	for i := 0; i < int(a.n); i++ {
 		vols[i] = vols[a.n]
@@ -60,10 +66,6 @@ func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gr
 	items := []opts.LineData{}
 	for _, v := range vols {
 		items = append(items, opts.LineData{Value: v})
-	}
-
-	if color == "" {
-		color = lineColors[0]
 	}
 
 	return charts.NewLine().
@@ -76,7 +78,7 @@ func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gr
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   color,
+				Color:   colors[a.ci],
 				Opacity: opacityMed,
 			}))
 }

@@ -313,13 +313,15 @@ func New(cfg Config) *TAChart {
 
 	layout := gridLayouts[0]
 	top = layout.top - 5
-	for i, ol := range cfg.overlays {
-		globalOptsData.titles = append(globalOptsData.titles, ol.getTitleOpts(top, layout.left+5, lineColors[i])...)
+	ci := 0
+	for _, ol := range cfg.overlays {
+		globalOptsData.titles = append(globalOptsData.titles, ol.getTitleOpts(top, layout.left+5, ci)...)
 		top += chartLabelFontHeight
+		ci += ol.getNumColors()
 	}
 	for i, ind := range cfg.indicators {
 		layout := gridLayouts[i+2]
-		globalOptsData.titles = append(globalOptsData.titles, ind.getTitleOpts(layout.top-5, layout.left+5, lineColors[i])...)
+		globalOptsData.titles = append(globalOptsData.titles, ind.getTitleOpts(layout.top-5, layout.left+5, 0)...)
 	}
 	layout = gridLayouts[len(gridLayouts)-1]
 	globalOptsData.titles = append(globalOptsData.titles, opts.Title{
@@ -406,8 +408,8 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 
 	chart.SetGlobalOptions(c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)...)
 
-	for i, ol := range c.cfg.overlays {
-		chart.Overlap(ol.genChart(opens, highs, lows, closes, vols, xAxis, 0, lineColors[i]))
+	for _, ol := range c.cfg.overlays {
+		chart.Overlap(ol.genChart(opens, highs, lows, closes, vols, xAxis, 0))
 	}
 
 	for i := 0; i < len(c.extendedXAxis); i++ {
@@ -441,7 +443,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 
 	// grid index starting from 2 (candlestick+event)
 	for i, ind := range c.cfg.indicators {
-		chart.Overlap(ind.genChart(opens, highs, lows, closes, vols, xAxis, i+2, ""))
+		chart.Overlap(ind.genChart(opens, highs, lows, closes, vols, xAxis, i+2))
 	}
 
 	bar := charts.NewBar().

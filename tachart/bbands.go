@@ -14,10 +14,11 @@ type bbands struct {
 	n       int64
 	nStdDev float64
 	isSma   bool
+	ci      int
 }
 
 func NewBBandsSMA(n int, nStdDev float64) Indicator {
-	return bbands{
+	return &bbands{
 		nm:      fmt.Sprintf("BBANDS(SMA, %v)", n),
 		n:       int64(n),
 		nStdDev: nStdDev,
@@ -26,7 +27,7 @@ func NewBBandsSMA(n int, nStdDev float64) Indicator {
 }
 
 func NewBBandsEMA(n int, nStdDev float64) Indicator {
-	return bbands{
+	return &bbands{
 		nm:      fmt.Sprintf("BBANDS(EMA, %v)", n),
 		n:       int64(n),
 		nStdDev: nStdDev,
@@ -50,11 +51,16 @@ func (b bbands) yAxisMax() string {
 	return ""
 }
 
-func (b bbands) getTitleOpts(top, left int, color string) []opts.Title {
+func (b bbands) getNumColors() int {
+	return 2
+}
+
+func (b *bbands) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+	b.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[0],
+				Color:    colors[b.ci],
 				FontSize: chartLabelFontSize,
 			},
 			Title: b.nm + "-Ma",
@@ -63,7 +69,7 @@ func (b bbands) getTitleOpts(top, left int, color string) []opts.Title {
 		},
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[1],
+				Color:    colors[b.ci+1],
 				FontSize: chartLabelFontSize,
 			},
 			Title: b.nm + "-Upper",
@@ -72,7 +78,7 @@ func (b bbands) getTitleOpts(top, left int, color string) []opts.Title {
 		},
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[1],
+				Color:    colors[b.ci+1],
 				FontSize: chartLabelFontSize,
 			},
 			Title: b.nm + "-Lower",
@@ -82,7 +88,7 @@ func (b bbands) getTitleOpts(top, left int, color string) []opts.Title {
 	}
 }
 
-func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
+func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	var u, m, l []float64
 	if b.isSma {
 		u, m, l = tart.BBandsArr(tart.SMA, closes, b.n, b.nStdDev, b.nStdDev)
@@ -109,7 +115,7 @@ func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIn
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[0],
+				Color:   colors[b.ci],
 				Opacity: opacityMed,
 			}))
 	ul := charts.NewLine().
@@ -122,7 +128,7 @@ func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIn
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[1],
+				Color:   colors[b.ci+1],
 				Opacity: opacityMed,
 			}))
 	ll := charts.NewLine().
@@ -135,7 +141,7 @@ func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIn
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[1],
+				Color:   colors[b.ci+1],
 				Opacity: opacityMed,
 			}))
 

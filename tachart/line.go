@@ -10,12 +10,15 @@ import (
 type line struct {
 	nms     []string
 	valsArr [][]float64
+	nc      int
+	ci      int
 }
 
 func NewLine(name string, vals []float64) Indicator {
 	return &line{
 		nms:     []string{name},
 		valsArr: [][]float64{vals},
+		nc:      1,
 	}
 }
 
@@ -23,6 +26,7 @@ func NewLine2(n0 string, vals0 []float64, n1 string, vals1 []float64) Indicator 
 	return &line{
 		nms:     []string{n0, n1},
 		valsArr: [][]float64{vals0, vals1},
+		nc:      2,
 	}
 }
 
@@ -30,6 +34,7 @@ func NewLine3(n0 string, vals0 []float64, n1 string, vals1 []float64, n2 string,
 	return &line{
 		nms:     []string{n0, n1, n2},
 		valsArr: [][]float64{vals0, vals1, vals2},
+		nc:      3,
 	}
 }
 
@@ -49,12 +54,17 @@ func (b line) yAxisMax() string {
 	return ""
 }
 
-func (b line) getTitleOpts(top, left int, _ string) []opts.Title {
+func (b line) getNumColors() int {
+	return b.nc
+}
+
+func (b *line) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+	b.ci = colorIndex
 	var tls []opts.Title
 	for i, nm := range b.nms {
 		tls = append(tls, opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[i],
+				Color:    colors[b.ci+i],
 				FontSize: chartLabelFontSize,
 			},
 			Title: nm,
@@ -65,7 +75,7 @@ func (b line) getTitleOpts(top, left int, _ string) []opts.Title {
 	return tls
 }
 
-func (b line) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
+func (b line) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	lineItems := []opts.LineData{}
 	for _, v := range b.valsArr[0] {
 		lineItems = append(lineItems, opts.LineData{Value: v})
@@ -81,7 +91,7 @@ func (b line) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[0],
+				Color:   colors[b.ci],
 				Opacity: opacityMed,
 			}),
 			charts.WithMarkLineStyleOpts(
@@ -111,7 +121,7 @@ func (b line) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int
 					ZLevel:     100,
 				}),
 				charts.WithLineStyleOpts(opts.LineStyle{
-					Color:   lineColors[i],
+					Color:   colors[b.ci+i],
 					Opacity: opacityMed,
 				}),
 				charts.WithMarkLineStyleOpts(

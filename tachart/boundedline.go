@@ -15,10 +15,11 @@ type boundedLine struct {
 	max         float64
 	lowerMarker float64
 	upperMarker float64
+	ci          int
 }
 
 func NewBoundedLine(name string, vals []float64, min, max, lowerMarker, upperMarker float64) Indicator {
-	return boundedLine{
+	return &boundedLine{
 		nm:          name,
 		vals:        vals,
 		min:         min,
@@ -44,11 +45,16 @@ func (b boundedLine) yAxisMax() string {
 	return fmt.Sprintf("function(value) { return %v }", b.max)
 }
 
-func (b boundedLine) getTitleOpts(top, left int, _ string) []opts.Title {
+func (b boundedLine) getNumColors() int {
+	return 1
+}
+
+func (b *boundedLine) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+	b.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
 			TitleStyle: &opts.TextStyle{
-				Color:    lineColors[0],
+				Color:    colors[b.ci],
 				FontSize: chartLabelFontSize,
 			},
 			Title: b.nm,
@@ -58,7 +64,7 @@ func (b boundedLine) getTitleOpts(top, left int, _ string) []opts.Title {
 	}
 }
 
-func (b boundedLine) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int, _ string) charts.Overlaper {
+func (b boundedLine) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	lineItems := []opts.LineData{}
 	for _, v := range b.vals {
 		lineItems = append(lineItems, opts.LineData{Value: v})
@@ -74,7 +80,7 @@ func (b boundedLine) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIn
 				ZLevel:     100,
 			}),
 			charts.WithLineStyleOpts(opts.LineStyle{
-				Color:   lineColors[0],
+				Color:   colors[b.ci],
 				Opacity: opacityMed,
 			}),
 			charts.WithMarkLineNameYAxisItemOpts(
