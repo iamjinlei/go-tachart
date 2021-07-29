@@ -2,6 +2,7 @@ package tachart
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/iamjinlei/go-tart"
 
@@ -13,6 +14,7 @@ type atr struct {
 	nm string
 	n  int64
 	ci int
+	dp int
 }
 
 func NewATR(n int) Indicator {
@@ -27,15 +29,15 @@ func (a atr) name() string {
 }
 
 func (a atr) yAxisLabel() string {
-	return ""
+	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
 func (a atr) yAxisMin() string {
-	return ""
+	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
 func (a atr) yAxisMax() string {
-	return ""
+	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
 func (a atr) getNumColors() int {
@@ -58,13 +60,14 @@ func (a *atr) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 }
 
 func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
-	vols := tart.AtrArr(highs, lows, closes, a.n)
+	vals := tart.AtrArr(highs, lows, closes, a.n)
 	for i := 0; i < int(a.n); i++ {
-		vols[i] = vols[a.n]
+		vals[i] = vals[a.n]
 	}
+	a.dp = decimals(vals)
 
 	items := []opts.LineData{}
-	for _, v := range vols {
+	for _, v := range vals {
 		items = append(items, opts.LineData{Value: v})
 	}
 

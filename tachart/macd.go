@@ -129,6 +129,7 @@ func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridInde
 	histBar := charts.NewBar().
 		SetXAxis(xAxis).
 		AddSeries(c.nm+"-Hist", barItems, charts.WithBarChartOpts(opts.BarChart{
+			BarWidth:   "60%",
 			XAxisIndex: gridIndex,
 			YAxisIndex: gridIndex,
 			ZLevel:     100,

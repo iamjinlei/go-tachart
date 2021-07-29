@@ -1,6 +1,7 @@
 package tachart
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/iamjinlei/go-tachart/charts"
@@ -12,6 +13,7 @@ type line struct {
 	valsArr [][]float64
 	nc      int
 	ci      int
+	dp      int
 }
 
 func NewLine(name string, vals []float64) Indicator {
@@ -19,6 +21,7 @@ func NewLine(name string, vals []float64) Indicator {
 		nms:     []string{name},
 		valsArr: [][]float64{vals},
 		nc:      1,
+		dp:      decimals(vals),
 	}
 }
 
@@ -27,6 +30,7 @@ func NewLine2(n0 string, vals0 []float64, n1 string, vals1 []float64) Indicator 
 		nms:     []string{n0, n1},
 		valsArr: [][]float64{vals0, vals1},
 		nc:      2,
+		dp:      decimals(vals0, vals1),
 	}
 }
 
@@ -35,6 +39,7 @@ func NewLine3(n0 string, vals0 []float64, n1 string, vals1 []float64, n2 string,
 		nms:     []string{n0, n1, n2},
 		valsArr: [][]float64{vals0, vals1, vals2},
 		nc:      3,
+		dp:      decimals(vals0, vals1, vals2),
 	}
 }
 
@@ -43,15 +48,15 @@ func (b line) name() string {
 }
 
 func (b line) yAxisLabel() string {
-	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
+	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
 func (b line) yAxisMin() string {
-	return ""
+	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
 func (b line) yAxisMax() string {
-	return ""
+	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
 func (b line) getNumColors() int {

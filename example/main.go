@@ -176,6 +176,7 @@ bottom bar
 			tachart.NewATR(5),
 			tachart.NewBoundedLine("custom_bounded_line", vals0, 0, 100, 20, 80),
 			tachart.NewLine2("double_line0", vals0, "double_line1", vals1),
+			tachart.NewBar("bars", vals0),
 		).
 		UseRepoAssets() // serving assets file from current repo, avoid network access
 
