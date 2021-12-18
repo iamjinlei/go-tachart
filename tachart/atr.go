@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/iamjinlei/go-tart"
+	"github.com/sosnovski/go-tart"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/opts"
 )
 
 type atr struct {
