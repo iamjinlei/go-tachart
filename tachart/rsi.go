@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sosnovski/go-tart"
-
 	"github.com/sosnovski/go-tachart/charts"
 	"github.com/sosnovski/go-tachart/opts"
 )
