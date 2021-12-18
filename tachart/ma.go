@@ -3,6 +3,8 @@ package tachart
 import (
 	"fmt"
 
+	"github.com/iamjinlei/go-tart"
+
 	"github.com/sosnovski/go-tachart/charts"
 	"github.com/sosnovski/go-tachart/opts"
 )

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/iamjinlei/go-tart"
+
 	"github.com/sosnovski/go-tachart/charts"
 	"github.com/sosnovski/go-tachart/opts"
 )
@@ -63,7 +65,7 @@ func (r *rsi) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 func (r rsi) GenChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	vals := tart.RsiArr(closes, r.n)
 
-	lineItems := []opts.LineData{}
+	var lineItems []opts.LineData
 	for _, v := range vals {
 		lineItems = append(lineItems, opts.LineData{Value: v})
 	}
