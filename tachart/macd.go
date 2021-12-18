@@ -27,27 +27,27 @@ func NewMACD(fast, slow, signal int) Indicator {
 	}
 }
 
-func (c macd) name() string {
+func (c macd) Name() string {
 	return c.nm
 }
 
-func (c macd) yAxisLabel() string {
+func (c macd) YAxisLabel() string {
 	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 }
 
-func (c macd) yAxisMin() string {
+func (c macd) YAxisMin() string {
 	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 }
 
-func (c macd) yAxisMax() string {
+func (c macd) YAxisMax() string {
 	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 }
 
-func (c macd) getNumColors() int {
+func (c macd) GetNumColors() int {
 	return 2
 }
 
-func (c *macd) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (c *macd) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	c.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -71,7 +71,7 @@ func (c *macd) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (c macd) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (c macd) GenChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	macd, signal, hist := tart.MacdArr(closes, c.fast, c.slow, c.signal)
 
 	lineItems := []opts.LineData{}

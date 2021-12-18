@@ -35,27 +35,27 @@ func NewBBandsEMA(n int, nStdDev float64) Indicator {
 	}
 }
 
-func (b bbands) name() string {
+func (b bbands) Name() string {
 	return b.nm
 }
 
-func (b bbands) yAxisLabel() string {
+func (b bbands) YAxisLabel() string {
 	return ""
 }
 
-func (b bbands) yAxisMin() string {
+func (b bbands) YAxisMin() string {
 	return ""
 }
 
-func (b bbands) yAxisMax() string {
+func (b bbands) YAxisMax() string {
 	return ""
 }
 
-func (b bbands) getNumColors() int {
+func (b bbands) GetNumColors() int {
 	return 2
 }
 
-func (b *bbands) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (b *bbands) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	b.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -88,7 +88,7 @@ func (b *bbands) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (b bbands) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (b bbands) GenChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	var u, m, l []float64
 	if b.isSma {
 		u, m, l = tart.BBandsArr(tart.SMA, closes, b.n, b.nStdDev, b.nStdDev)

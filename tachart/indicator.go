@@ -11,18 +11,18 @@ const (
 )
 
 type Indicator interface {
-	// indicator name
-	name() string
-	// y axis label formatter
-	yAxisLabel() string
-	// y axis min label formatter
-	yAxisMin() string
-	// y axis max label formatter
-	yAxisMax() string
-	// # of colors needed
-	getNumColors() int
-	// indicator chart legend config
-	getTitleOpts(top, left int, colorIndex int) []opts.Title
-	// indicator chart config
-	genChart(opens, highs, lows, closes, vols []float64, xAxis interface{}, gridIndex int) charts.Overlaper
+	// Name indicator name
+	Name() string
+	// YAxisLabel label formatter
+	YAxisLabel() string
+	// YAxisMin label formatter
+	YAxisMin() string
+	// YAxisMax label formatter
+	YAxisMax() string
+	// GetNumColors # of colors needed
+	GetNumColors() int
+	// GetTitleOpts indicator chart legend config
+	GetTitleOpts(top, left int, colorIndex int) []opts.Title
+	// GenChart indicator chart config
+	GenChart(opens, highs, lows, closes, vols []float64, xAxis interface{}, gridIndex int) charts.Overlaper
 }

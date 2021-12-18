@@ -23,27 +23,27 @@ func NewBar(name string, vals []float64) Indicator {
 	}
 }
 
-func (b bar) name() string {
+func (b bar) Name() string {
 	return b.nm
 }
 
-func (b bar) yAxisLabel() string {
+func (b bar) YAxisLabel() string {
 	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b bar) yAxisMin() string {
+func (b bar) YAxisMin() string {
 	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b bar) yAxisMax() string {
+func (b bar) YAxisMax() string {
 	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b bar) getNumColors() int {
+func (b bar) GetNumColors() int {
 	return 1
 }
 
-func (b *bar) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (b *bar) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	b.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -58,7 +58,7 @@ func (b *bar) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (b bar) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (b bar) GenChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	barItems := []opts.BarData{}
 	for _, v := range b.vals {
 		style := &opts.ItemStyle{

@@ -43,27 +43,27 @@ func NewLine3(n0 string, vals0 []float64, n1 string, vals1 []float64, n2 string,
 	}
 }
 
-func (b line) name() string {
+func (b line) Name() string {
 	return strings.Join(b.nms, ", ")
 }
 
-func (b line) yAxisLabel() string {
+func (b line) YAxisLabel() string {
 	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b line) yAxisMin() string {
+func (b line) YAxisMin() string {
 	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b line) yAxisMax() string {
+func (b line) YAxisMax() string {
 	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", b.dp), -1)
 }
 
-func (b line) getNumColors() int {
+func (b line) GetNumColors() int {
 	return b.nc
 }
 
-func (b *line) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (b *line) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	b.ci = colorIndex
 	var tls []opts.Title
 	for i, nm := range b.nms {
@@ -80,7 +80,7 @@ func (b *line) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	return tls
 }
 
-func (b line) genChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (b line) GenChart(_, _, _, _, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	lineItems := []opts.LineData{}
 	for _, v := range b.valsArr[0] {
 		lineItems = append(lineItems, opts.LineData{Value: v})
