@@ -40,7 +40,7 @@ const (
 			square(13,'H',cdl.color,cdl.value[4].toFixed(__DECIMAL_PLACES__)) + '<br/>';
 			for (var i = 1; i < value.length; i++) {
 				var s = value[i];
-				if (s != null) {
+				if (s != null && s.value != null) {
 					ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
 				}
 			}
