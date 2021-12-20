@@ -457,14 +457,17 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		chart.Overlap(ind.GenChart(opens, highs, lows, closes, vols, xAxis, i+2))
 	}
 
-	bar := charts.NewBar().
-		SetXAxis(xAxis).
-		AddSeries("Vol", volSeries, charts.WithBarChartOpts(opts.BarChart{
-			BarWidth:   "60%",
-			XAxisIndex: len(c.cfg.indicators) + 2,
-			YAxisIndex: len(c.cfg.indicators) + 2,
-		}))
-	chart.Overlap(bar)
+	if !c.cfg.disableVol {
+		bar := charts.NewBar().
+			SetXAxis(xAxis).
+			AddSeries("Vol", volSeries, charts.WithBarChartOpts(opts.BarChart{
+				BarWidth:   "60%",
+				XAxisIndex: len(c.cfg.indicators) + 2,
+				YAxisIndex: len(c.cfg.indicators) + 2,
+			}))
+		chart.Overlap(bar)
+	}
+
 	chart.AddJSFuncs(c.cfg.jsFuncs...)
 
 	fp, err := os.Create(path)

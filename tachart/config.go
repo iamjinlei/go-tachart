@@ -39,6 +39,7 @@ type Config struct {
 	draggable          bool
 	eventDescWrapWidth int // wrap width of event desc on tooltip, 0 means no-wrap
 	jsFuncs            []string
+	disableVol         bool
 }
 
 func NewConfig() *Config {
@@ -54,6 +55,7 @@ func NewConfig() *Config {
 		},
 		draggable:          false,
 		eventDescWrapWidth: 160,
+		disableVol:         false,
 	}
 }
 
@@ -98,6 +100,11 @@ func (c *Config) SetRightColContent(content string, w int) *Config {
 
 func (c *Config) SetDraggable(draggable bool) *Config {
 	c.draggable = draggable
+	return c
+}
+
+func (c *Config) SetDisableVols(disable bool) *Config {
+	c.disableVol = disable
 	return c
 }
 
