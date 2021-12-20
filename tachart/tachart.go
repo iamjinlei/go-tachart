@@ -55,14 +55,23 @@ const (
 		}`
 	minRoundFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return (value.min*0.99).toFixed(__DECIMAL_PLACES__);
 		}`
 	maxRoundFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return (value.max*1.01).toFixed(__DECIMAL_PLACES__);
 		}`
 	yLabelFormatterFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return value.toFixed(__DECIMAL_PLACES__);
 		}`
 )
