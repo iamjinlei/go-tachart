@@ -42,12 +42,7 @@ const (
 				var s = value[i];
 				if (s != null && s.value != null) {
 					if (s.value.constructor.name == 'Array') {
-    					for (var i = 0; i < s.value.length; i++) {
-							var ss = s.value[i];
-							if (ss != null) {
-								ret += square(13,s.seriesName,s.color,ss.toFixed(__DECIMAL_PLACES__)) + '<br/>';
-							}
-						}
+						ret += square(13,s.seriesName,s.color,s.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>';
 					} else {
 						ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
 					}
