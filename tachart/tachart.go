@@ -41,7 +41,16 @@ const (
 			for (var i = 1; i < value.length; i++) {
 				var s = value[i];
 				if (s != null && s.value != null) {
-					ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					if (s.value.constructor.name == "Array") {
+    					for (var i = 0; i < s.value.length; i++) {
+							var ss = s.value[i];
+							if (ss != null) {
+								ret += square(13,s.seriesName,s.color,ss.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+							}
+						}
+					} else {
+						ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					}
 				}
 			}
 
