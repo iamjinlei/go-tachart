@@ -41,7 +41,7 @@ const (
 			for (var i = 1; i < value.length; i++) {
 				var s = value[i];
 				if (s != null && s.value != null) {
-					if (s.value.constructor.name == "Array") {
+					if (s.value.constructor.name == 'Array') {
     					for (var i = 0; i < s.value.length; i++) {
 							var ss = s.value[i];
 							if (ss != null) {
