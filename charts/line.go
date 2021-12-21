@@ -37,6 +37,14 @@ func (c *Line) AddSeries(name string, data []opts.LineData, options ...SeriesOpt
 	return c
 }
 
+// AddSeriesInterface adds the new series.
+func (c *Line) AddSeriesInterface(name string, data interface{}, options ...SeriesOpts) *Line {
+	series := SingleSeries{Name: name, Type: types.ChartLine, Data: data}
+	series.configureSeriesOpts(options...)
+	c.MultiSeries = append(c.MultiSeries, series)
+	return c
+}
+
 // Validate validates the given configuration.
 func (c *Line) Validate() {
 	c.XAxisList[0].Data = c.xAxisData
