@@ -38,7 +38,7 @@ func (c *Line) AddSeries(name string, data []opts.LineData, options ...SeriesOpt
 }
 
 // AddSeriesInterface adds the new series.
-func (c *Line) AddSeriesInterface(name string, data interface{}, markArea MarkArea, options ...SeriesOpts) *Line {
+func (c *Line) AddSeriesInterface(name string, data interface{}, markArea *MarkArea, options ...SeriesOpts) *Line {
 	series := SingleSeries{Name: name, Type: types.ChartLine, Data: data, MarkArea: markArea}
 	series.configureSeriesOpts(options...)
 	c.MultiSeries = append(c.MultiSeries, series)

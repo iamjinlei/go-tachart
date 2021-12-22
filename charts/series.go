@@ -85,7 +85,7 @@ type SingleSeries struct {
 	// series data
 	Data interface{} `json:"data"`
 
-	MarkArea MarkArea `json:"markArea"`
+	MarkArea *MarkArea `json:"markArea,omitempty"`
 
 	// series options
 	*opts.ItemStyle    `json:"itemStyle,omitempty"`
