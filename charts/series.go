@@ -85,6 +85,8 @@ type SingleSeries struct {
 	// series data
 	Data interface{} `json:"data"`
 
+	MarkArea MarkArea `json:"markArea"`
+
 	// series options
 	*opts.ItemStyle    `json:"itemStyle,omitempty"`
 	*opts.Label        `json:"label,omitempty"`
@@ -96,6 +98,10 @@ type SingleSeries struct {
 	*opts.LineStyle    `json:"lineStyle,omitempty"`
 	*opts.AreaStyle    `json:"areaStyle,omitempty"`
 	*opts.TextStyle    `json:"textStyle,omitempty"`
+}
+
+type MarkArea struct {
+	Data interface{} `json:"data"`
 }
 
 type SeriesOpts func(s *SingleSeries)
