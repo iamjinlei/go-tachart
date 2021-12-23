@@ -132,13 +132,13 @@ func New(cfg Config) *TAChart {
 
 	// grid layuout: N = len(indicators) + 1
 	// ----------------------------------------
-	//   candlestick chart + overlay + events (h/2.5)
+	//   candlestick chart + overlay + events (h/2)
 	// ----------------------------------------
-	//   		indicator chart               (h/2.5/N)
+	//   		indicator chart               (h/2/N)
 	//   			...
-	//   		indicator chart               (h/2.5/N)
+	//   		indicator chart               (h/2/N)
 	// ----------------------------------------
-	//   		  volume chart                (h/2.5/N)
+	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
 
 	indicatorsLen := len(cfg.indicators) + 2
@@ -148,34 +148,34 @@ func New(cfg Config) *TAChart {
 
 	h := (cfg.layout.chartHeight - sliderH) / indicatorsLen
 	// candlestick+overlay
-	cdlChartTop := float64(20)
+	cdlChartTop := 20
 	// event
-	eventChartTop := cdlChartTop + float64(h)*2.5 - 30
+	eventChartTop := cdlChartTop + h*2 - 30
 	eventChartH := 10
 
 	grids := []opts.Grid{
 		opts.Grid{ // candlestick + overlay
 			Left:   px(left),
 			Right:  px(right),
-			Top:    px(int(cdlChartTop)),
-			Height: px(h * 2),
+			Top:    px(cdlChartTop),
+			Height: px(h * 3),
 		},
 		opts.Grid{ // event
 			Left:   px(left),
 			Right:  px(right),
-			Top:    px(int(eventChartTop)),
+			Top:    px(eventChartTop),
 			Height: px(eventChartH),
 		},
 	}
 	gridLayouts := []gridLayout{
 		gridLayout{
-			top:  int(cdlChartTop),
+			top:  cdlChartTop,
 			left: left,
 			w:    right - left,
-			h:    int(float64(h) * 2.5),
+			h:    h * 3,
 		},
 		gridLayout{
-			top:  int(eventChartTop),
+			top:  eventChartTop,
 			left: left,
 			w:    right - left,
 			h:    eventChartH,
@@ -196,23 +196,23 @@ func New(cfg Config) *TAChart {
 	}
 
 	// indicator & vol chart, inddex starting from 2
-	top := cdlChartTop + float64(h)*2.5 + float64(gap*2)
+	top := cdlChartTop + h*3 + gap*2
 	for i := 0; i < len(cfg.indicators)+1; i++ {
 		gridIndex := i + 2
 		grids = append(grids, opts.Grid{
 			Left:   px(left),
 			Right:  px(right),
-			Top:    px(int(top)),
+			Top:    px(top),
 			Height: px(h - gap),
 		})
 		gridLayouts = append(gridLayouts, gridLayout{
-			top:  int(top),
+			top:  top,
 			left: left,
 			w:    right - left,
 			h:    h - gap,
 		})
 
-		top += float64(h)
+		top += h
 
 		xAxisIndex = append(xAxisIndex, gridIndex)
 
@@ -332,10 +332,10 @@ func New(cfg Config) *TAChart {
 	}
 
 	layout := gridLayouts[0]
-	top = float64(layout.top) - 5
+	top = layout.top - 5
 	ci := 0
 	for _, ol := range cfg.overlays {
-		globalOptsData.titles = append(globalOptsData.titles, ol.GetTitleOpts(int(top), layout.left+5, ci)...)
+		globalOptsData.titles = append(globalOptsData.titles, ol.GetTitleOpts(top, layout.left+5, ci)...)
 		top += chartLabelFontHeight
 		ci += ol.GetNumColors()
 	}
