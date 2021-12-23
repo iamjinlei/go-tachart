@@ -338,15 +338,17 @@ func New(cfg Config) *TAChart {
 		layout := gridLayouts[i+2]
 		globalOptsData.titles = append(globalOptsData.titles, ind.GetTitleOpts(layout.top-5, layout.left+5, 0)...)
 	}
-	layout = gridLayouts[len(gridLayouts)-1]
-	globalOptsData.titles = append(globalOptsData.titles, opts.Title{
-		TitleStyle: &opts.TextStyle{
-			FontSize: chartLabelFontSize,
-		},
-		Title: "Vol",
-		Left:  px(layout.left + 5),
-		Top:   px(layout.top - 5),
-	})
+	if !cfg.disableVol {
+		layout = gridLayouts[len(gridLayouts)-1]
+		globalOptsData.titles = append(globalOptsData.titles, opts.Title{
+			TitleStyle: &opts.TextStyle{
+				FontSize: chartLabelFontSize,
+			},
+			Title: "Vol",
+			Left:  px(layout.left + 5),
+			Top:   px(layout.top - 5),
+		})
+	}
 
 	return &TAChart{
 		cfg:            cfg,
