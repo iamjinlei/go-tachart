@@ -141,7 +141,7 @@ func New(cfg Config) *TAChart {
 	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
 
-	indicatorsLen := len(cfg.indicators) + 4
+	indicatorsLen := len(cfg.indicators) + 5
 	if !cfg.disableVol {
 		indicatorsLen += 1
 	}
@@ -150,7 +150,7 @@ func New(cfg Config) *TAChart {
 	// candlestick+overlay
 	cdlChartTop := 20
 	// event
-	eventChartTop := cdlChartTop + h*4 - 30
+	eventChartTop := cdlChartTop + h*5 - 30
 	eventChartH := 10
 
 	grids := []opts.Grid{
@@ -158,7 +158,7 @@ func New(cfg Config) *TAChart {
 			Left:   px(left),
 			Right:  px(right),
 			Top:    px(cdlChartTop),
-			Height: px(h * 4),
+			Height: px(h * 5),
 		},
 		opts.Grid{ // event
 			Left:   px(left),
@@ -172,7 +172,7 @@ func New(cfg Config) *TAChart {
 			top:  cdlChartTop,
 			left: left,
 			w:    right - left,
-			h:    h * 4,
+			h:    h * 5,
 		},
 		gridLayout{
 			top:  eventChartTop,
@@ -196,7 +196,7 @@ func New(cfg Config) *TAChart {
 	}
 
 	// indicator & vol chart, inddex starting from 2
-	top := cdlChartTop + h*4 + gap*2
+	top := cdlChartTop + h*5 + gap*2
 	for i := 0; i < len(cfg.indicators)+1; i++ {
 		gridIndex := i + 2
 		grids = append(grids, opts.Grid{
