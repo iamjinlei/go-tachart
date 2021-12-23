@@ -150,7 +150,7 @@ func New(cfg Config) *TAChart {
 	// candlestick+overlay
 	cdlChartTop := 20
 	// event
-	eventChartTop := cdlChartTop + h*2 - 30
+	eventChartTop := cdlChartTop + h*3 - 30
 	eventChartH := 10
 
 	grids := []opts.Grid{
