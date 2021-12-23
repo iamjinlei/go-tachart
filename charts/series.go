@@ -101,7 +101,8 @@ type SingleSeries struct {
 }
 
 type MarkArea struct {
-	Data interface{} `json:"data"`
+	*opts.ItemStyle `json:"itemStyle,omitempty"`
+	Data            interface{} `json:"data"`
 }
 
 type SeriesOpts func(s *SingleSeries)
