@@ -141,7 +141,7 @@ func New(cfg Config) *TAChart {
 	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
 
-	indicatorsLen := len(cfg.indicators) + 2
+	indicatorsLen := len(cfg.indicators) + 3
 	if !cfg.disableVol {
 		indicatorsLen += 1
 	}
