@@ -141,7 +141,12 @@ func New(cfg Config) *TAChart {
 	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
 
-	h := (cfg.layout.chartHeight - sliderH) / (len(cfg.indicators) + 1 + 2)
+	indicatorsLen := len(cfg.indicators) + 2
+	if !cfg.disableVol {
+		indicatorsLen += 1
+	}
+
+	h := (cfg.layout.chartHeight - sliderH) / indicatorsLen
 	// candlestick+overlay
 	cdlChartTop := 20
 	// event
