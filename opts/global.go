@@ -824,7 +824,7 @@ type DataZoom struct {
 	// otherwise it might be not smooth when dragging.
 	// If animation set as false or animationDurationUpdate set as 0, and data size is not very large,
 	// and it seems to be not smooth when dragging, you can set throttle as 0 to improve that.
-	Throttle float32 `json:"throttle,omitempty"`
+	Throttle *float32 `json:"throttle,omitempty"`
 
 	// Specify which xAxis is/are controlled by the dataZoom-inside when Cartesian coordinate system is used.
 	// By default the first xAxis that parallel to dataZoom are controlled when dataZoom-inside.

@@ -259,6 +259,8 @@ func New(cfg Config) *TAChart {
 		})
 	}
 
+	var throttle = float32(0)
+
 	globalOptsData := globalOptsData{
 		init: opts.Initialization{
 			Theme:      string(cfg.theme),
@@ -308,7 +310,7 @@ func New(cfg Config) *TAChart {
 				Start:      0,
 				End:        100,
 				XAxisIndex: xAxisIndex,
-				Throttle:   0,
+				Throttle:   &throttle,
 			},
 		},
 	}
@@ -319,7 +321,7 @@ func New(cfg Config) *TAChart {
 				Start:      0,
 				End:        100,
 				XAxisIndex: xAxisIndex,
-				Throttle:   0,
+				Throttle:   &throttle,
 			})
 	}
 

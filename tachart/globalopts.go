@@ -9,10 +9,6 @@ import (
 	"github.com/sosnovski/go-tachart/opts"
 )
 
-const (
-	defaultCandleBarWidth = 16
-)
-
 type globalOptsData struct {
 	w           int64
 	init        opts.Initialization
@@ -29,17 +25,6 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 	tooltip := c.tooltip
 	tooltip.Formatter = strings.Replace(tooltip.Formatter, "__EVENT_MAP__", toJson(eventDescMap), 1)
 
-	numBars := (cfg.layout.chartWidth - left - right) / defaultCandleBarWidth
-	pct := float32(numBars*100) / float32(n)
-	if pct == 0 {
-		pct = 0.1
-	}
-	dataZooms := []opts.DataZoom{}
-	for _, dz := range c.dataZooms {
-		dz.Start = dz.End - pct
-		dataZooms = append(dataZooms, dz)
-	}
-
 	return []charts.GlobalOpts{
 		charts.WithTitleOpts(c.titles...),
 		charts.WithInitializationOpts(c.init),
@@ -48,7 +33,7 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 		charts.WithGridOpts(c.grids...),
 		charts.WithXAxisOpts(c.xAxis),
 		charts.WithYAxisOpts(c.yAxis),
-		charts.WithDataZoomOpts(dataZooms...),
+		charts.WithDataZoomOpts(c.dataZooms...),
 	}
 }
 
