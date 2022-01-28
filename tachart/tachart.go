@@ -185,7 +185,12 @@ func New(cfg Config) *TAChart {
 			h:    eventChartH,
 		},
 	}
-	xAxisIndex := []int{0, 1}
+	xAxisIndex := []int{0}
+
+	if !cfg.disableVol {
+		xAxisIndex = append(xAxisIndex, 1)
+	}
+
 	extendedXAxis := []opts.XAxis{
 		{ // event
 			Show:      false,
