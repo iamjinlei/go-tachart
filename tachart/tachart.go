@@ -185,16 +185,15 @@ func New(cfg Config) *TAChart {
 			h:    eventChartH,
 		},
 	}
-	xAxisIndex := []int{0}
-
-	if !cfg.disableVol {
-		xAxisIndex = append(xAxisIndex, 1)
-	}
+	xAxisIndex := []int{0, 1}
 
 	extendedXAxis := []opts.XAxis{
 		{ // event
 			Show:      false,
 			GridIndex: 1,
+			AxisPointer: &opts.AxisPointer{
+				Show: &False,
+			},
 		},
 	}
 	extendedYAxis := []opts.YAxis{
@@ -208,9 +207,6 @@ func New(cfg Config) *TAChart {
 	top := cdlChartTop + h*5 + gap*2
 	for i := 0; i < len(cfg.indicators)+1; i++ {
 		gridIndex := i + 2
-		if cfg.disableVol {
-			gridIndex = i + 1
-		}
 		grids = append(grids, opts.Grid{
 			Left:   px(left),
 			Right:  px(right),
