@@ -16,6 +16,11 @@ const (
 	tooltipPositionFunc = `
 		function(pos, params, el, elRect, size) {
 			var obj = {bottom: 10, left: 30};
+			if (pos[0] > size.viewSize[0]/2) {
+				obj['left'] = 30;
+			} else {
+				obj['right'] = 30;
+			}
 			return obj;
 		}`
 	tooltipFormatterFuncTpl = `
