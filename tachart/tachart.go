@@ -39,6 +39,18 @@ const (
 			square(13,'L',cdl.color,cdl.value[3].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'H',cdl.color,cdl.value[4].toFixed(__DECIMAL_PLACES__)) + '<br/>';
 
+			for (var i = 1; i < value.length; i++) {
+				var s = value[i];
+				if (s != null && s.value != null) {
+					if (s.value.constructor.name == 'Array') {
+						ret += square(13,s.seriesName,s.color,s.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					} else {
+						ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					}
+				}
+			}
+
+
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
 				if (__WRAP_DESC__) {
@@ -173,13 +185,13 @@ func New(cfg Config) *TAChart {
 	}
 	xAxisIndex := []int{0, 1}
 	extendedXAxis := []opts.XAxis{
-		opts.XAxis{ // event
+		{ // event
 			Show:      false,
 			GridIndex: 1,
 		},
 	}
 	extendedYAxis := []opts.YAxis{
-		opts.YAxis{ // event
+		{ // event
 			Show:      false,
 			GridIndex: 1,
 		},
@@ -246,10 +258,10 @@ func New(cfg Config) *TAChart {
 			Scale:       true,
 			SplitNumber: 2,
 			SplitLine: &opts.SplitLine{
-				Show: true,
+				Show: false,
 			},
 			AxisLabel: &opts.AxisLabel{
-				Show:         true,
+				Show:         false,
 				ShowMinLabel: true,
 				ShowMaxLabel: true,
 				Formatter:    opts.FuncOpts(indYLabelFormatterFunc),
@@ -274,9 +286,12 @@ func New(cfg Config) *TAChart {
 			TriggerOn: "mousemove|click",
 			Position:  opts.FuncOpts(tooltipPositionFunc),
 			Formatter: opts.FuncOpts(tooltipFormatterFunc),
+			AxisPointer: &opts.AxisPointer{
+				Type: "cross",
+			},
 		},
 		axisPointer: opts.AxisPointer{
-			Type: "line",
+			Type: "cross",
 			Snap: true,
 			Link: opts.AxisPointerLink{
 				XAxisIndex: "all",
