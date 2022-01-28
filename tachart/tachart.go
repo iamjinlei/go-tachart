@@ -12,6 +12,8 @@ import (
 	"github.com/sosnovski/go-tachart/opts"
 )
 
+var False = false
+
 const (
 	tooltipPositionFunc = `
 		function(pos, params, el, elRect, size) {
@@ -201,6 +203,9 @@ func New(cfg Config) *TAChart {
 	top := cdlChartTop + h*5 + gap*2
 	for i := 0; i < len(cfg.indicators)+1; i++ {
 		gridIndex := i + 2
+		if cfg.disableVol {
+			gridIndex = i + 1
+		}
 		grids = append(grids, opts.Grid{
 			Left:   px(left),
 			Right:  px(right),
@@ -228,6 +233,9 @@ func New(cfg Config) *TAChart {
 			AxisLabel: &opts.AxisLabel{
 				Show: false,
 			},
+			//AxisPointer: &opts.AxisPointer{
+			//	Show: &False,
+			//},
 		})
 		// TODO: make this configurable
 		min := minRoundFunc

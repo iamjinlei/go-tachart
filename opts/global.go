@@ -353,7 +353,7 @@ type AxisPointerLink struct {
 // AxisPointer is the option set for an axisPointer component
 // https://echarts.apache.org/en/option.html#axisPointer
 type AxisPointer struct {
-
+	Show *bool `json:"show,omitempty"`
 	// Indicator type.
 	// Options:
 	//   - 'line' line indicator.
@@ -623,7 +623,8 @@ type XAxis struct {
 	SplitLine *SplitLine `json:"splitLine,omitempty"`
 
 	// Settings related to axis label.
-	AxisLabel *AxisLabel `json:"axisLabel,omitempty"`
+	AxisLabel   *AxisLabel   `json:"axisLabel,omitempty"`
+	AxisPointer *AxisPointer `json:"axisPointer,omitempty"`
 
 	AxisTick *AxisTick `json:"axisTick,omitempty"`
 }
