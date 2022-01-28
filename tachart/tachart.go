@@ -15,19 +15,13 @@ import (
 const (
 	tooltipPositionFunc = `
 		function(pos, params, el, elRect, size) {
-			var obj = {top: 10};
-			if (pos[0] > size.viewSize[0]/2) {
-				obj['left'] = 30;
-			} else {
-				obj['right'] = 30;
-			}
-			return obj;
+			return {bottom: 10, left: 30};
 		}`
 	tooltipFormatterFuncTpl = `
 		function(value) {
 			var eventMap = JSON.parse('__EVENT_MAP__');
 			var title = (sz,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;font-weight:bold;">'+txt+'</span>';
-			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;color:white;>'+sign+'</span>'+txt+'</span>';
+			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;color:white;">'+sign+'</span>'+txt+'</span>';
 			var wrap = (sz,txt,width) => '<span style="display:inline-block;width:'+width+'px;word-break:break-word;word-wrap:break-word;white-space:pre-wrap;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 			var nowrap = (sz,txt) => '<span style="display:inline-block;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 
@@ -38,16 +32,6 @@ const (
 			square(13,'C',cdl.color,cdl.value[2].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'L',cdl.color,cdl.value[3].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'H',cdl.color,cdl.value[4].toFixed(__DECIMAL_PLACES__)) + '<br/>';
-			for (var i = 1; i < value.length; i++) {
-				var s = value[i];
-				if (s != null && s.value != null) {
-					if (s.value.constructor.name == 'Array') {
-						ret += square(13,s.seriesName,s.color,s.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>';
-					} else {
-						ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
-					}
-				}
-			}
 
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
