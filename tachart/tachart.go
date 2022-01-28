@@ -15,7 +15,7 @@ import (
 const (
 	tooltipPositionFunc = `
 		function(pos, params, el, elRect, size) {
-			var obj = {bottom: 10, left: 30};
+			var obj = {top: 10};
 			if (pos[0] > size.viewSize[0]/2) {
 				obj['left'] = 30;
 			} else {
