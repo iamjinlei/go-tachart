@@ -16,11 +16,6 @@ const (
 	tooltipPositionFunc = `
 		function(pos, params, el, elRect, size) {
 			var obj = {bottom: 10, left: 30};
-			//if (pos[0] > size.viewSize[0]/2) {
-			//	obj['left'] = 30;
-			//} else {
-			//	obj['right'] = 30;
-			//}
 			return obj;
 		}`
 	tooltipFormatterFuncTpl = `
@@ -38,16 +33,6 @@ const (
 			square(13,'C',cdl.color,cdl.value[2].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'L',cdl.color,cdl.value[3].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'H',cdl.color,cdl.value[4].toFixed(__DECIMAL_PLACES__)) + '<br/>';
-			//for (var i = 1; i < value.length; i++) {
-			//	var s = value[i];
-			//	if (s != null && s.value != null) {
-			//		if (s.value.constructor.name == 'Array') {
-			//			ret += square(13,s.seriesName,s.color,s.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>';
-			//		} else {
-			//			ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
-			//		}
-			//	}
-			//}
 
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
