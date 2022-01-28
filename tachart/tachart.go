@@ -305,9 +305,10 @@ func New(cfg Config) *TAChart {
 		dataZooms: []opts.DataZoom{
 			opts.DataZoom{
 				Type:       "slider",
-				Start:      50,
+				Start:      0,
 				End:        100,
 				XAxisIndex: xAxisIndex,
+				Throttle:   0,
 			},
 		},
 	}
@@ -315,9 +316,10 @@ func New(cfg Config) *TAChart {
 		globalOptsData.dataZooms = append(globalOptsData.dataZooms,
 			opts.DataZoom{
 				Type:       "inside",
-				Start:      50,
+				Start:      0,
 				End:        100,
 				XAxisIndex: xAxisIndex,
+				Throttle:   0,
 			})
 	}
 
