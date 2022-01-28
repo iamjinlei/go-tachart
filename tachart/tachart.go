@@ -205,7 +205,12 @@ func New(cfg Config) *TAChart {
 
 	// indicator & vol chart, inddex starting from 2
 	top := cdlChartTop + h*5 + gap*2
-	for i := 0; i < len(cfg.indicators)+1; i++ {
+	x := 1
+	if cfg.disableVol {
+		x = 0
+	}
+
+	for i := 0; i < len(cfg.indicators)+x; i++ {
 		gridIndex := i + 2
 		grids = append(grids, opts.Grid{
 			Left:   px(left),
