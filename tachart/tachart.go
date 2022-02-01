@@ -240,7 +240,7 @@ func New(cfg Config) *TAChart {
 				Show: false,
 			},
 			AxisPointer: &opts.AxisPointer{
-				Show: &False,
+				Label: &opts.AxisPointerLabel{Show: false},
 			},
 		})
 		// TODO: make this configurable

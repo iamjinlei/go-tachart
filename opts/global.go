@@ -366,7 +366,13 @@ type AxisPointer struct {
 	// This feature usually makes sense in value axis and time axis, where tiny points can be seeked automatically.
 	Snap bool `json:"snap,omitempty"`
 
-	Link AxisPointerLink `json:"link,omitempty"`
+	Label *AxisPointerLabel `json:"label,omitempty"`
+	Link  AxisPointerLink   `json:"link,omitempty"`
+}
+
+type AxisPointerLabel struct {
+	// Set this to false to prevent the axis label from appearing.
+	Show bool `json:"show"`
 }
 
 // Toolbox is the option set for a toolbox component.
