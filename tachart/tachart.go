@@ -239,9 +239,9 @@ func New(cfg Config) *TAChart {
 			AxisLabel: &opts.AxisLabel{
 				Show: false,
 			},
-			//AxisPointer: &opts.AxisPointer{
-			//	Show: &False,
-			//},
+			AxisPointer: &opts.AxisPointer{
+				Show: &False,
+			},
 		})
 		// TODO: make this configurable
 		min := minRoundFunc
