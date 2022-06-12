@@ -437,13 +437,13 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 			XAxisIndex: 0,
 			YAxisIndex: 0,
 		}),
-		//charts.WithItemStyleOpts(opts.ItemStyle{
-		//	Color:        colorUpBar,
-		//	Color0:       colorDownBar,
-		//	BorderColor:  colorUpBar,
-		//	BorderColor0: colorDownBar,
-		//	Opacity:      opacityHeavy,
-		//}),
+		charts.WithItemStyleOpts(opts.ItemStyle{
+			Color:        colorUpBar,
+			Color0:       colorDownBar,
+			BorderColor:  colorUpBar,
+			BorderColor0: colorDownBar,
+			Opacity:      opacityHeavy,
+		}),
 	)
 
 	eventDescMap := map[string]string{}
