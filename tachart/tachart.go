@@ -354,6 +354,12 @@ func New(cfg Config) *TAChart {
 			})
 	}
 
+	if cfg.showLegend {
+		globalOptsData.legend = opts.Legend{
+			Show: true,
+		}
+	}
+
 	layout := gridLayouts[0]
 	top = layout.top - 5
 	ci := 0

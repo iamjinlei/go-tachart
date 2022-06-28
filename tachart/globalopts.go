@@ -19,6 +19,7 @@ type globalOptsData struct {
 	xAxis       opts.XAxis // candlestick+overlay
 	yAxis       opts.YAxis // candlestick+overlay
 	dataZooms   []opts.DataZoom
+	legend      opts.Legend
 }
 
 func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]string) []charts.GlobalOpts {
@@ -34,6 +35,7 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 		charts.WithXAxisOpts(c.xAxis),
 		charts.WithYAxisOpts(c.yAxis),
 		charts.WithDataZoomOpts(c.dataZooms...),
+		charts.WithLegendOpts(c.legend),
 	}
 }
 

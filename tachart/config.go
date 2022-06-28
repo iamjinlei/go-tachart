@@ -40,6 +40,7 @@ type Config struct {
 	eventDescWrapWidth int // wrap width of event desc on tooltip, 0 means no-wrap
 	jsFuncs            []string
 	disableVol         bool
+	showLegend         bool
 }
 
 func NewConfig() *Config {
