@@ -343,7 +343,9 @@ func New(cfg Config) *TAChart {
 			},
 		},
 		legend: opts.Legend{
-			Show: cfg.showLegend,
+			Show:    cfg.showLegend,
+			Padding: []int{10},
+			Bottom:  "0",
 		},
 	}
 	if cfg.draggable {
