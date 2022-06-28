@@ -342,6 +342,9 @@ func New(cfg Config) *TAChart {
 				Throttle:   &throttle,
 			},
 		},
+		legend: opts.Legend{
+			Show: cfg.showLegend,
+		},
 	}
 	if cfg.draggable {
 		globalOptsData.dataZooms = append(globalOptsData.dataZooms,
@@ -352,12 +355,6 @@ func New(cfg Config) *TAChart {
 				XAxisIndex: xAxisIndex,
 				Throttle:   &throttle,
 			})
-	}
-
-	if cfg.showLegend {
-		globalOptsData.legend = opts.Legend{
-			Show: true,
-		}
 	}
 
 	layout := gridLayouts[0]
@@ -457,7 +454,10 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 		eventDescMap[e.Label] = e.Description
 	}
 
-	chart.SetGlobalOptions(c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)...)
+	gOpts := c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)
+
+	fmt.Printf("%+v\n", gOpts)
+	chart.SetGlobalOptions(gOpts...)
 
 	for _, ol := range c.cfg.overlays {
 		chart.Overlap(ol.GenChart(opens, highs, lows, closes, vols, xAxis, 0))
