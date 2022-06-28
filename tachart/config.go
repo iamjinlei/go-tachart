@@ -109,6 +109,11 @@ func (c *Config) SetDisableVols(disable bool) *Config {
 	return c
 }
 
+func (c *Config) SetEnableLegend(enabled bool) *Config {
+	c.showLegend = enabled
+	return c
+}
+
 func (c *Config) SetEventDescWrapWidth(w int) *Config {
 	c.eventDescWrapWidth = w
 	return c
