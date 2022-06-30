@@ -456,7 +456,6 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 	}
 
 	chart.SetGlobalOptions(c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)...)
-	fmt.Printf("%#v\n", chart.Legend)
 
 	for _, ol := range c.cfg.overlays {
 		chart.Overlap(ol.GenChart(opens, highs, lows, closes, vols, xAxis, 0))
