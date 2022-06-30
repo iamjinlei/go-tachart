@@ -334,9 +334,9 @@ func New(cfg Config) *TAChart {
 			},
 		},
 		dataZooms: []opts.DataZoom{
-			opts.DataZoom{
+			{
 				Type:       "slider",
-				Start:      0,
+				Start:      90,
 				End:        100,
 				XAxisIndex: xAxisIndex,
 				Throttle:   &throttle,
