@@ -382,6 +382,22 @@ func New(cfg Config) *TAChart {
 		})
 	}
 
+	var titles []string
+	for _, titleOpt := range globalOptsData.titles {
+		titles = append(titles, titleOpt.Title)
+	}
+
+	var legendData []string
+	for _, title := range titles {
+		if !strings.EqualFold(title, "kline") &&
+			!strings.EqualFold(title, "events") &&
+			!strings.EqualFold(title, "ao") {
+			legendData = append(legendData, title)
+		}
+	}
+
+	globalOptsData.legend.Data = legendData
+
 	return &TAChart{
 		cfg:            cfg,
 		globalOptsData: globalOptsData,
