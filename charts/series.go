@@ -1,6 +1,6 @@
 package charts
 
-import "github.com/iamjinlei/go-tachart/opts"
+import "github.com/sosnovski/go-tachart/opts"
 
 type SingleSeries struct {
 	Name   string `json:"name,omitempty"`
@@ -85,6 +85,8 @@ type SingleSeries struct {
 	// series data
 	Data interface{} `json:"data"`
 
+	MarkArea *MarkArea `json:"markArea,omitempty"`
+
 	// series options
 	*opts.ItemStyle    `json:"itemStyle,omitempty"`
 	*opts.Label        `json:"label,omitempty"`
@@ -96,6 +98,11 @@ type SingleSeries struct {
 	*opts.LineStyle    `json:"lineStyle,omitempty"`
 	*opts.AreaStyle    `json:"areaStyle,omitempty"`
 	*opts.TextStyle    `json:"textStyle,omitempty"`
+}
+
+type MarkArea struct {
+	*opts.ItemStyle `json:"itemStyle,omitempty"`
+	Data            interface{} `json:"data"`
 }
 
 type SeriesOpts func(s *SingleSeries)

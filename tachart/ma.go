@@ -5,8 +5,8 @@ import (
 
 	"github.com/iamjinlei/go-tart"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/opts"
 )
 
 type ma struct {
@@ -32,27 +32,27 @@ func NewEMA(n int) Indicator {
 	}
 }
 
-func (c ma) name() string {
+func (c ma) Name() string {
 	return c.nm
 }
 
-func (c ma) yAxisLabel() string {
+func (c ma) YAxisLabel() string {
 	return ""
 }
 
-func (c ma) yAxisMin() string {
+func (c ma) YAxisMin() string {
 	return ""
 }
 
-func (c ma) yAxisMax() string {
+func (c ma) YAxisMax() string {
 	return ""
 }
 
-func (c ma) getNumColors() int {
+func (c ma) GetNumColors() int {
 	return 1
 }
 
-func (c *ma) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (c *ma) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	c.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -67,7 +67,7 @@ func (c *ma) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (c ma) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (c ma) GenChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	ma := c.fn(closes, c.n)
 	for i := 0; i < int(c.n); i++ {
 		ma[i] = ma[c.n]

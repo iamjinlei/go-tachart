@@ -1,8 +1,8 @@
 package charts
 
 import (
-	"github.com/iamjinlei/go-tachart/opts"
-	"github.com/iamjinlei/go-tachart/types"
+	"github.com/sosnovski/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/types"
 )
 
 // Chart3D is a chart in 3D coordinates.

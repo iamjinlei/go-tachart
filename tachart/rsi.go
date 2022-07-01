@@ -6,8 +6,8 @@ import (
 
 	"github.com/iamjinlei/go-tart"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/opts"
 )
 
 type rsi struct {
@@ -27,27 +27,27 @@ func NewRSI(n int, oversold, overbought float64) Indicator {
 	}
 }
 
-func (r rsi) name() string {
+func (r rsi) Name() string {
 	return r.nm
 }
 
-func (r rsi) yAxisLabel() string {
+func (r rsi) YAxisLabel() string {
 	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 }
 
-func (r rsi) yAxisMin() string {
+func (r rsi) YAxisMin() string {
 	return `function(value) { return 0 }`
 }
 
-func (r rsi) yAxisMax() string {
+func (r rsi) YAxisMax() string {
 	return `function(value) { return 100 }`
 }
 
-func (r rsi) getNumColors() int {
+func (r rsi) GetNumColors() int {
 	return 1
 }
 
-func (r *rsi) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (r *rsi) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	r.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -62,10 +62,10 @@ func (r *rsi) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (r rsi) genChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (r rsi) GenChart(_, _, _, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	vals := tart.RsiArr(closes, r.n)
 
-	lineItems := []opts.LineData{}
+	var lineItems []opts.LineData
 	for _, v := range vals {
 		lineItems = append(lineItems, opts.LineData{Value: v})
 	}

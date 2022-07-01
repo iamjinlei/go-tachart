@@ -48,7 +48,7 @@ In this example, a simple chart is created with a few lines of code. A complete 
 package main
 
 import (
-	"github.com/iamjinlei/go-tachart/tachart"
+	"github.com/sosnovski/go-tachart/tachart"
 )
 
 func main() {

@@ -5,12 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/opts"
-)
-
-const (
-	defaultCandleBarWidth = 16
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/opts"
 )
 
 type globalOptsData struct {
@@ -23,22 +19,12 @@ type globalOptsData struct {
 	xAxis       opts.XAxis // candlestick+overlay
 	yAxis       opts.YAxis // candlestick+overlay
 	dataZooms   []opts.DataZoom
+	legend      opts.Legend
 }
 
 func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]string) []charts.GlobalOpts {
 	tooltip := c.tooltip
 	tooltip.Formatter = strings.Replace(tooltip.Formatter, "__EVENT_MAP__", toJson(eventDescMap), 1)
-
-	numBars := (cfg.layout.chartWidth - left - right) / defaultCandleBarWidth
-	pct := float32(numBars*100) / float32(n)
-	if pct == 0 {
-		pct = 0.1
-	}
-	dataZooms := []opts.DataZoom{}
-	for _, dz := range c.dataZooms {
-		dz.Start = dz.End - pct
-		dataZooms = append(dataZooms, dz)
-	}
 
 	return []charts.GlobalOpts{
 		charts.WithTitleOpts(c.titles...),
@@ -48,7 +34,8 @@ func (c globalOptsData) genOpts(cfg Config, n int, eventDescMap map[string]strin
 		charts.WithGridOpts(c.grids...),
 		charts.WithXAxisOpts(c.xAxis),
 		charts.WithYAxisOpts(c.yAxis),
-		charts.WithDataZoomOpts(dataZooms...),
+		charts.WithDataZoomOpts(c.dataZooms...),
+		charts.WithLegendOpts(c.legend),
 	}
 }
 

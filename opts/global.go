@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/iamjinlei/go-tachart/types"
+	"github.com/sosnovski/go-tachart/types"
 )
 
 func init() {
@@ -353,7 +353,7 @@ type AxisPointerLink struct {
 // AxisPointer is the option set for an axisPointer component
 // https://echarts.apache.org/en/option.html#axisPointer
 type AxisPointer struct {
-
+	Show *bool `json:"show,omitempty"`
 	// Indicator type.
 	// Options:
 	//   - 'line' line indicator.
@@ -366,7 +366,13 @@ type AxisPointer struct {
 	// This feature usually makes sense in value axis and time axis, where tiny points can be seeked automatically.
 	Snap bool `json:"snap,omitempty"`
 
-	Link AxisPointerLink `json:"link,omitempty"`
+	Label *AxisPointerLabel `json:"label,omitempty"`
+	Link  AxisPointerLink   `json:"link,omitempty"`
+}
+
+type AxisPointerLabel struct {
+	// Set this to false to prevent the axis label from appearing.
+	Show bool `json:"show"`
 }
 
 // Toolbox is the option set for a toolbox component.
@@ -623,7 +629,8 @@ type XAxis struct {
 	SplitLine *SplitLine `json:"splitLine,omitempty"`
 
 	// Settings related to axis label.
-	AxisLabel *AxisLabel `json:"axisLabel,omitempty"`
+	AxisLabel   *AxisLabel   `json:"axisLabel,omitempty"`
+	AxisPointer *AxisPointer `json:"axisPointer,omitempty"`
 
 	AxisTick *AxisTick `json:"axisTick,omitempty"`
 }
@@ -824,7 +831,7 @@ type DataZoom struct {
 	// otherwise it might be not smooth when dragging.
 	// If animation set as false or animationDurationUpdate set as 0, and data size is not very large,
 	// and it seems to be not smooth when dragging, you can set throttle as 0 to improve that.
-	Throttle float32 `json:"throttle,omitempty"`
+	Throttle *float32 `json:"throttle,omitempty"`
 
 	// Specify which xAxis is/are controlled by the dataZoom-inside when Cartesian coordinate system is used.
 	// By default the first xAxis that parallel to dataZoom are controlled when dataZoom-inside.

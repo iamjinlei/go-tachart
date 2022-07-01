@@ -1,9 +1,9 @@
 package charts
 
 import (
-	"github.com/iamjinlei/go-tachart/opts"
-	"github.com/iamjinlei/go-tachart/render"
-	"github.com/iamjinlei/go-tachart/types"
+	"github.com/sosnovski/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/render"
+	"github.com/sosnovski/go-tachart/types"
 )
 
 // Line represents a line chart.
@@ -32,6 +32,14 @@ func (c *Line) SetXAxis(x interface{}) *Line {
 // AddSeries adds the new series.
 func (c *Line) AddSeries(name string, data []opts.LineData, options ...SeriesOpts) *Line {
 	series := SingleSeries{Name: name, Type: types.ChartLine, Data: data}
+	series.configureSeriesOpts(options...)
+	c.MultiSeries = append(c.MultiSeries, series)
+	return c
+}
+
+// AddSeriesInterface adds the new series.
+func (c *Line) AddSeriesInterface(name string, data interface{}, markArea *MarkArea, options ...SeriesOpts) *Line {
+	series := SingleSeries{Name: name, Type: types.ChartLine, Data: data, MarkArea: markArea}
 	series.configureSeriesOpts(options...)
 	c.MultiSeries = append(c.MultiSeries, series)
 	return c

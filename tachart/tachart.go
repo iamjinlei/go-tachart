@@ -7,10 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/components"
-	"github.com/iamjinlei/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/components"
+	"github.com/sosnovski/go-tachart/opts"
 )
+
+var False = false
 
 const (
 	tooltipPositionFunc = `
@@ -27,7 +29,7 @@ const (
 		function(value) {
 			var eventMap = JSON.parse('__EVENT_MAP__');
 			var title = (sz,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;font-weight:bold;">'+txt+'</span>';
-			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;">'+sign+'</span>'+txt+'</span>';
+			var square = (sz,sign,color,txt) => '<span style="display:inline;line-height:'+(sz+2)+'px;font-size:'+sz+'px;"><span style="display:inline-block;height:'+(sz+2)+'px;border-radius:3px;padding:1px 4px 1px 4px;text-align:center;margin-right:10px;background-color:' + color + ';vertical-align:top;color:white;">'+sign+'</span>'+txt+'</span>';
 			var wrap = (sz,txt,width) => '<span style="display:inline-block;width:'+width+'px;word-break:break-word;word-wrap:break-word;white-space:pre-wrap;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 			var nowrap = (sz,txt) => '<span style="display:inline-block;line-height:'+(sz+2)+'px;font-size:'+sz+'px;">'+txt+'</span>';
 
@@ -38,10 +40,18 @@ const (
 			square(13,'C',cdl.color,cdl.value[2].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'L',cdl.color,cdl.value[3].toFixed(__DECIMAL_PLACES__)) + '<br/>' +
 			square(13,'H',cdl.color,cdl.value[4].toFixed(__DECIMAL_PLACES__)) + '<br/>';
+
 			for (var i = 1; i < value.length; i++) {
 				var s = value[i];
-				ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+				if (s != null && s.value != null) {
+					if (s.value.constructor.name == 'Array') {
+						ret += square(13,s.seriesName,s.color,s.value[1].toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					} else {
+						ret += square(13,s.seriesName,s.color,s.value.toFixed(__DECIMAL_PLACES__)) + '<br/>';
+					}
+				}
 			}
+
 
 			var desc = eventMap[cdl.axisValueLabel];
 			if (desc) {
@@ -55,14 +65,23 @@ const (
 		}`
 	minRoundFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return (value.min*0.99).toFixed(__DECIMAL_PLACES__);
 		}`
 	maxRoundFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return (value.max*1.01).toFixed(__DECIMAL_PLACES__);
 		}`
 	yLabelFormatterFuncTpl = `
 		function(value) {
+			if (value == null) {
+				return null;
+			}
 			return value.toFixed(__DECIMAL_PLACES__);
 		}`
 )
@@ -126,11 +145,16 @@ func New(cfg Config) *TAChart {
 	//   		  volume chart                (h/2/N)
 	// ----------------------------------------
 
-	h := (cfg.layout.chartHeight - sliderH) / (len(cfg.indicators) + 1 + 2)
+	indicatorsLen := len(cfg.indicators) + 5
+	if !cfg.disableVol {
+		indicatorsLen += 1
+	}
+
+	h := (cfg.layout.chartHeight - sliderH) / indicatorsLen
 	// candlestick+overlay
 	cdlChartTop := 20
 	// event
-	eventChartTop := cdlChartTop + h*2 - 30
+	eventChartTop := cdlChartTop + h*5 - 30
 	eventChartH := 10
 
 	grids := []opts.Grid{
@@ -138,7 +162,7 @@ func New(cfg Config) *TAChart {
 			Left:   px(left),
 			Right:  px(right),
 			Top:    px(cdlChartTop),
-			Height: px(h * 2),
+			Height: px(h * 5),
 		},
 		opts.Grid{ // event
 			Left:   px(left),
@@ -152,7 +176,7 @@ func New(cfg Config) *TAChart {
 			top:  cdlChartTop,
 			left: left,
 			w:    right - left,
-			h:    h * 2,
+			h:    h * 5,
 		},
 		gridLayout{
 			top:  eventChartTop,
@@ -162,22 +186,31 @@ func New(cfg Config) *TAChart {
 		},
 	}
 	xAxisIndex := []int{0, 1}
+
 	extendedXAxis := []opts.XAxis{
-		opts.XAxis{ // event
+		{ // event
 			Show:      false,
 			GridIndex: 1,
+			AxisPointer: &opts.AxisPointer{
+				Show: &False,
+			},
 		},
 	}
 	extendedYAxis := []opts.YAxis{
-		opts.YAxis{ // event
+		{ // event
 			Show:      false,
 			GridIndex: 1,
 		},
 	}
 
 	// indicator & vol chart, inddex starting from 2
-	top := cdlChartTop + h*2 + gap*2
-	for i := 0; i < len(cfg.indicators)+1; i++ {
+	top := cdlChartTop + h*5 + gap*2
+	x := 1
+	if cfg.disableVol {
+		x = 0
+	}
+
+	for i := 0; i < len(cfg.indicators)+x; i++ {
 		gridIndex := i + 2
 		grids = append(grids, opts.Grid{
 			Left:   px(left),
@@ -206,6 +239,9 @@ func New(cfg Config) *TAChart {
 			AxisLabel: &opts.AxisLabel{
 				Show: false,
 			},
+			AxisPointer: &opts.AxisPointer{
+				Label: &opts.AxisPointerLabel{Show: false},
+			},
 		})
 		// TODO: make this configurable
 		min := minRoundFunc
@@ -216,15 +252,15 @@ func New(cfg Config) *TAChart {
 			min = "0"
 			indYLabelFormatterFunc = strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", "0", -1)
 		} else {
-			v := cfg.indicators[i].yAxisLabel()
+			v := cfg.indicators[i].YAxisLabel()
 			if v != "" {
 				indYLabelFormatterFunc = v
 			}
-			v = cfg.indicators[i].yAxisMin()
+			v = cfg.indicators[i].YAxisMin()
 			if v != "" {
 				min = v
 			}
-			v = cfg.indicators[i].yAxisMax()
+			v = cfg.indicators[i].YAxisMax()
 			if v != "" {
 				max = v
 			}
@@ -236,10 +272,10 @@ func New(cfg Config) *TAChart {
 			Scale:       true,
 			SplitNumber: 2,
 			SplitLine: &opts.SplitLine{
-				Show: true,
+				Show: false,
 			},
 			AxisLabel: &opts.AxisLabel{
-				Show:         true,
+				Show:         false,
 				ShowMinLabel: true,
 				ShowMaxLabel: true,
 				Formatter:    opts.FuncOpts(indYLabelFormatterFunc),
@@ -248,6 +284,8 @@ func New(cfg Config) *TAChart {
 			Max: opts.FuncOpts(max),
 		})
 	}
+
+	var throttle = float32(0)
 
 	globalOptsData := globalOptsData{
 		init: opts.Initialization{
@@ -262,9 +300,12 @@ func New(cfg Config) *TAChart {
 			TriggerOn: "mousemove|click",
 			Position:  opts.FuncOpts(tooltipPositionFunc),
 			Formatter: opts.FuncOpts(tooltipFormatterFunc),
+			AxisPointer: &opts.AxisPointer{
+				Type: "cross",
+			},
 		},
 		axisPointer: opts.AxisPointer{
-			Type: "line",
+			Type: "cross",
 			Snap: true,
 			Link: opts.AxisPointerLink{
 				XAxisIndex: "all",
@@ -293,21 +334,27 @@ func New(cfg Config) *TAChart {
 			},
 		},
 		dataZooms: []opts.DataZoom{
-			opts.DataZoom{
+			{
 				Type:       "slider",
-				Start:      50,
+				Start:      93,
 				End:        100,
 				XAxisIndex: xAxisIndex,
+				Throttle:   &throttle,
 			},
+		},
+		legend: opts.Legend{
+			Show:    cfg.showLegend,
+			Padding: []int{0, 15},
 		},
 	}
 	if cfg.draggable {
 		globalOptsData.dataZooms = append(globalOptsData.dataZooms,
 			opts.DataZoom{
 				Type:       "inside",
-				Start:      50,
+				Start:      0,
 				End:        100,
 				XAxisIndex: xAxisIndex,
+				Throttle:   &throttle,
 			})
 	}
 
@@ -315,23 +362,47 @@ func New(cfg Config) *TAChart {
 	top = layout.top - 5
 	ci := 0
 	for _, ol := range cfg.overlays {
-		globalOptsData.titles = append(globalOptsData.titles, ol.getTitleOpts(top, layout.left+5, ci)...)
+		globalOptsData.titles = append(globalOptsData.titles, ol.GetTitleOpts(top, layout.left+5, ci)...)
 		top += chartLabelFontHeight
-		ci += ol.getNumColors()
+		ci += ol.GetNumColors()
 	}
 	for i, ind := range cfg.indicators {
 		layout := gridLayouts[i+2]
-		globalOptsData.titles = append(globalOptsData.titles, ind.getTitleOpts(layout.top-5, layout.left+5, 0)...)
+		globalOptsData.titles = append(globalOptsData.titles, ind.GetTitleOpts(layout.top-5, layout.left+5, 0)...)
 	}
-	layout = gridLayouts[len(gridLayouts)-1]
-	globalOptsData.titles = append(globalOptsData.titles, opts.Title{
-		TitleStyle: &opts.TextStyle{
-			FontSize: chartLabelFontSize,
-		},
-		Title: "Vol",
-		Left:  px(layout.left + 5),
-		Top:   px(layout.top - 5),
-	})
+	if !cfg.disableVol {
+		layout = gridLayouts[len(gridLayouts)-1]
+		globalOptsData.titles = append(globalOptsData.titles, opts.Title{
+			TitleStyle: &opts.TextStyle{
+				FontSize: chartLabelFontSize,
+			},
+			Title: "Vol",
+			Left:  px(layout.left + 5),
+			Top:   px(layout.top - 5),
+		})
+	}
+
+	var titles []string
+	for _, titleOpt := range globalOptsData.titles {
+		titles = append(titles, titleOpt.Title)
+	}
+
+	var legendData []string
+	for _, title := range titles {
+		var remove bool
+		for _, hidden := range cfg.hiddenLegendTitles {
+			if strings.EqualFold(title, hidden) {
+				remove = true
+				break
+			}
+		}
+
+		if !remove {
+			legendData = append(legendData, title)
+		}
+	}
+
+	globalOptsData.legend.Data = legendData
 
 	return &TAChart{
 		cfg:            cfg,
@@ -409,7 +480,7 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 	chart.SetGlobalOptions(c.globalOptsData.genOpts(c.cfg, len(cdls), eventDescMap)...)
 
 	for _, ol := range c.cfg.overlays {
-		chart.Overlap(ol.genChart(opens, highs, lows, closes, vols, xAxis, 0))
+		chart.Overlap(ol.GenChart(opens, highs, lows, closes, vols, xAxis, 0))
 	}
 
 	for i := 0; i < len(c.extendedXAxis); i++ {
@@ -443,17 +514,20 @@ func (c TAChart) GenStatic(cdls []Candle, events []Event, path string) error {
 
 	// grid index starting from 2 (candlestick+event)
 	for i, ind := range c.cfg.indicators {
-		chart.Overlap(ind.genChart(opens, highs, lows, closes, vols, xAxis, i+2))
+		chart.Overlap(ind.GenChart(opens, highs, lows, closes, vols, xAxis, i+2))
 	}
 
-	bar := charts.NewBar().
-		SetXAxis(xAxis).
-		AddSeries("Vol", volSeries, charts.WithBarChartOpts(opts.BarChart{
-			BarWidth:   "60%",
-			XAxisIndex: len(c.cfg.indicators) + 2,
-			YAxisIndex: len(c.cfg.indicators) + 2,
-		}))
-	chart.Overlap(bar)
+	if !c.cfg.disableVol {
+		bar := charts.NewBar().
+			SetXAxis(xAxis).
+			AddSeries("Vol", volSeries, charts.WithBarChartOpts(opts.BarChart{
+				BarWidth:   "60%",
+				XAxisIndex: len(c.cfg.indicators) + 2,
+				YAxisIndex: len(c.cfg.indicators) + 2,
+			}))
+		chart.Overlap(bar)
+	}
+
 	chart.AddJSFuncs(c.cfg.jsFuncs...)
 
 	fp, err := os.Create(path)

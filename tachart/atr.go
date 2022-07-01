@@ -6,8 +6,8 @@ import (
 
 	"github.com/iamjinlei/go-tart"
 
-	"github.com/iamjinlei/go-tachart/charts"
-	"github.com/iamjinlei/go-tachart/opts"
+	"github.com/sosnovski/go-tachart/charts"
+	"github.com/sosnovski/go-tachart/opts"
 )
 
 type atr struct {
@@ -24,27 +24,27 @@ func NewATR(n int) Indicator {
 	}
 }
 
-func (a atr) name() string {
+func (a atr) Name() string {
 	return a.nm
 }
 
-func (a atr) yAxisLabel() string {
+func (a atr) YAxisLabel() string {
 	return strings.Replace(yLabelFormatterFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
-func (a atr) yAxisMin() string {
+func (a atr) YAxisMin() string {
 	return strings.Replace(minRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
-func (a atr) yAxisMax() string {
+func (a atr) YAxisMax() string {
 	return strings.Replace(maxRoundFuncTpl, "__DECIMAL_PLACES__", fmt.Sprintf("%v", a.dp), -1)
 }
 
-func (a atr) getNumColors() int {
+func (a atr) GetNumColors() int {
 	return 1
 }
 
-func (a *atr) getTitleOpts(top, left int, colorIndex int) []opts.Title {
+func (a *atr) GetTitleOpts(top, left int, colorIndex int) []opts.Title {
 	a.ci = colorIndex
 	return []opts.Title{
 		opts.Title{
@@ -59,7 +59,7 @@ func (a *atr) getTitleOpts(top, left int, colorIndex int) []opts.Title {
 	}
 }
 
-func (a atr) genChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
+func (a atr) GenChart(_, highs, lows, closes, _ []float64, xAxis interface{}, gridIndex int) charts.Overlaper {
 	vals := tart.AtrArr(highs, lows, closes, a.n)
 	for i := 0; i < int(a.n); i++ {
 		vals[i] = vals[a.n]
