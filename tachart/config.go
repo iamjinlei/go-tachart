@@ -41,6 +41,7 @@ type Config struct {
 	jsFuncs            []string
 	disableVol         bool
 	showLegend         bool
+	hiddenLegendTitles []string
 }
 
 func NewConfig() *Config {
@@ -111,6 +112,11 @@ func (c *Config) SetDisableVols(disable bool) *Config {
 
 func (c *Config) SetEnableLegend(enabled bool) *Config {
 	c.showLegend = enabled
+	return c
+}
+
+func (c *Config) SetHiddenLegendTitles(hiddenLegendTitles []string) *Config {
+	c.hiddenLegendTitles = hiddenLegendTitles
 	return c
 }
 

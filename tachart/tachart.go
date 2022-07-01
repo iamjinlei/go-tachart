@@ -389,9 +389,15 @@ func New(cfg Config) *TAChart {
 
 	var legendData []string
 	for _, title := range titles {
-		if !strings.EqualFold(title, "kline") &&
-			!strings.EqualFold(title, "events") &&
-			!strings.EqualFold(title, "ao") {
+		var remove bool
+		for _, hidden := range cfg.hiddenLegendTitles {
+			if strings.EqualFold(title, hidden) {
+				remove = true
+				break
+			}
+		}
+
+		if !remove {
 			legendData = append(legendData, title)
 		}
 	}
