@@ -41,6 +41,8 @@ type Config struct {
 	jsFuncs            []string
 	disableVol         bool
 	showLegend         bool
+	zoomStart          float32
+	zoomEnd            float32
 	hiddenLegendTitles []string
 }
 
@@ -112,6 +114,12 @@ func (c *Config) SetDisableVols(disable bool) *Config {
 
 func (c *Config) SetEnableLegend(enabled bool) *Config {
 	c.showLegend = enabled
+	return c
+}
+
+func (c *Config) SetZoom(start, end float32) *Config {
+	c.zoomStart = start
+	c.zoomEnd = end
 	return c
 }
 
